@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:mx="library://ns.adobe.com/flex/mx" 
+		 creationComplete="tagedit_creationCompleteHandler(event)"
+		 width="820" height="50" 
+		 xmlns:components="com.hillelcoren.components.*"
+		 >
+	<s:layout>
+		<s:HorizontalLayout/>
+	</s:layout>
+
+	<fx:Script source="EditTag.as" />
+	<!--<s:Label id="clipName" width="100" />-->
+	<components:AdvancedAutoComplete
+		id="tagAutoComplete"
+		allowMultipleSelection="true"
+		allowNewValues="true"
+		showRemoveIcon = "true"
+		autoSelectEnabled = "false"
+		change="handleTagAutoCompleteChange()"
+		width="650">
+		<components:inlineButton>
+			<mx:Button icon="@Embed(source='/com/hillelcoren/assets/icons/down.png')" click="handleTagButtonClick()"/>
+		</components:inlineButton>
+	</components:AdvancedAutoComplete>
+	<s:Button id="applyBtn" label="Apply" click="applyBtn_clickHandler(event)" />
+	<s:Button id="cancelBtn" label="Cancel" click="cancelBtn_clickHandler(event)" />
+</s:Group>

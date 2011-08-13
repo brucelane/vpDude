@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<update xmlns="http://ns.riaspace.com/air/framework/update/description/1.1">
+
+        <!-- Mac update -->
+        <dmg>
+                <version>0.5.012</version>
+                <url>https://www.videopong.net/vpdudefiles/vpDude.dmg</url>
+            <description>
+            <![CDATA[
+				New in version 0.5.012: 
+				* AIR 2.6
+                * This a Mac update
+                ]]>
+        </description>
+        </dmg>
+        
+        <!-- Win update -->
+        <exe>
+                <version>0.5.012</version>
+                <url>https://www.videopong.net/vpdudefiles/vpDude.exe</url>
+            <description>
+            <![CDATA[
+ 				New in version version 0.5.012: 
+				* AIR 2.6
+                * This a Win update
+                ]]>
+        </description>
+        </exe>
+
+        <!-- Debian update -->
+        <deb>
+                <version>0.4.045</version>
+                <url>https://www.videopong.net/vpdudefiles/vpDude.deb</url>
+            <description>
+            <![CDATA[
+				New in version 0.4.045: 
+				* AIR 2.6
+                * This a Debian update
+                ]]>
+        </description>
+        </deb>
+
+        <!-- Redhat/Fedora/OpenSUSE update -->
+        <rpm>
+                <version>0.4.045</version>
+                <url>https://www.videopong.net/vpdudefiles/vpDude.rpm</url>
+            <description>
+            <![CDATA[
+				New in version 0.4.045: 
+				* AIR 2.6
+                * This a Redhat/Fedora/OpenSUSE update
+                ]]>
+        </description>
+        </rpm>
+        
+</update>

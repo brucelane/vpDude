@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:NavigatorContent xmlns:fx="http://ns.adobe.com/mxml/2009" 
+					xmlns:s="library://ns.adobe.com/flex/spark" 
+					xmlns:mx="library://ns.adobe.com/flex/mx" 
+					preinitialize="config_preinitializeHandler(event)"
+					creationComplete="config_creationCompleteHandler(event)"
+					label="config" 
+					>
+	<fx:Script source="TabConfig.as" />
+	<s:states>
+		<s:State name="Normal"/>
+		<s:State name="Busy"/>
+	</s:states>
+		<s:VGroup width="100%" paddingLeft="8" paddingRight="8" paddingTop="8" paddingBottom="8">
+			<!--<s:HGroup>
+				<s:Label width="{lblWidth}" text="Database files path:" verticalAlign="middle"/>
+				<s:TextInput width="{tiWidth}" text="{vpDbPath}" id="dbTextInput"/>
+				<s:Button label="..." id="browseConfigPathBtn" width="30" click="browseConfigPathBtn_clickHandler(event)"/>			
+			</s:HGroup>-->
+			<s:HGroup>
+				<s:Label height="20" paddingTop="6"
+						 text="If you have already a videopong.net account please fill in, otherwise please create one first on"/>
+				<!--<s:Button click="navigateToURL(new URLRequest('http://videopong.net'))" label="videopong.net" />-->
+				<mx:LinkButton label="videopong.net"
+							   click="navigateToURL(new URLRequest('http://videopong.net'))"
+							   paddingLeft="0" verticalCenter="10"/>
+			</s:HGroup>
+			<s:HGroup>
+				<s:Label width="{lblWidth}" text="User name:" verticalAlign="bottom"/>
+				<s:TextInput width="{tiWidth}" text="{userName}" id="userTextInput"/>
+			</s:HGroup>
+			<s:HGroup>
+				<s:Label width="{lblWidth}" text="Password:" verticalAlign="bottom"/>
+				<s:TextInput width="{tiWidth}" text="{hiddenPassword}" id="pwdTextInput" focusIn="pwdTextInput_focusInHandler(event)" change="pwdTextInput_changeHandler(event)"/>
+			</s:HGroup>
+			<s:HGroup>
+				<s:Label width="{lblWidth}" text="Local own videos path:" verticalAlign="bottom"/>
+				<s:TextInput width="{tiWidth}" text="{parentDocument.ownFolderPath}" id="ownTextInput"/>
+				<s:Button label="Select" toolTip="select my own folder" id="browseOwnPathBtn" click="browseOwnPathBtn_clickHandler(event)"/>	
+				<s:Button label="Show folder" toolTip="show my own files" id="exploreBtn" click="exploreBtn_clickHandler(event)"/>
+			</s:HGroup>
+			<s:HGroup>
+				<s:Label width="{lblWidth}" text="Preview size (default 320x240):" verticalAlign="bottom"/>
+				<s:TextInput width="{tiWidth}" text="{reso}" id="resoTextInput"/>
+			</s:HGroup>
+			<s:HGroup>
+				<s:Spacer width="{lblWidth}" />
+				<s:Button label="Apply settings" width="{resyncBtn.width}" id="applyBtn" click="applyBtn_clickHandler(event)"/>
+			</s:HGroup>
+			<s:HGroup>
+				<s:Spacer width="{lblWidth}" />
+				<s:Button label="Sync my own folder" label.Busy="Sync in progress.." enabled.Busy="false" width="200" toolTip="resync my own files" id="resyncBtn" click="resyncBtn_clickHandler(event)"/>
+				<s:Label id="syncStatus" verticalAlign="bottom"/>
+			</s:HGroup>
+			<s:VGroup width="100%" height="100%" paddingBottom="5" paddingLeft="5" paddingRight="5" paddingTop="5">
+				<s:TextArea id="log" width="100%" height="100"/>
+				<s:TextArea id="ffout" width="100%" height="250"/>
+				<s:Button label="Clear console text" click="log.text=''" />
+			</s:VGroup>			
+		</s:VGroup>
+
+</s:NavigatorContent>

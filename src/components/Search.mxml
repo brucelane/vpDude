@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:NavigatorContent xmlns:fx="http://ns.adobe.com/mxml/2009" 
+					xmlns:s="library://ns.adobe.com/flex/spark" 
+					xmlns:mx="library://ns.adobe.com/flex/mx" 
+					xmlns:components="com.hillelcoren.components.*"
+					label="search" 
+					creationComplete="search_creationCompleteHandler(event)" 
+					width="100%" height="100%" xmlns:components1="components.*"
+					>
+
+	<fx:Script source="TabSearch.as" />
+
+	<s:VGroup width="820" paddingLeft="3" paddingRight="3" paddingTop="3" paddingBottom="3">
+		<s:HGroup>
+			<s:Label text="Search:" width="50" paddingTop="10" paddingLeft="4"/>
+			<components:AdvancedAutoComplete
+				id="autoComplete"
+				allowMultipleSelection="true"
+				allowNewValues="true"
+				autoSelectEnabled = "false"
+				showRemoveIcon = "true"
+				change="handleAutoCompleteChange()"
+				prompt="Use comma to separate tags, backspace to remove"
+				width="590">
+				<components:inlineButton>
+					<mx:Button icon="@Embed(source='/com/hillelcoren/assets/icons/down.png')" click="handleButtonClick()"/>
+				</components:inlineButton>
+			</components:AdvancedAutoComplete>
+
+		</s:HGroup>
+		<s:HGroup >
+			<s:List id="clipList" width="490" height="520"
+					itemRenderer="components.ClipItemRenderer" 
+					labelField="@name"
+					dataProvider="{clips.clipsXMLList}"
+					>
+				<s:layout>
+					<s:TileLayout horizontalGap="10" />
+<!--					<s:TileLayout columnAlign="justifyUsingWidth" horizontalGap="0" horizontalAlign="justify" verticalAlign="middle" />-->
+				</s:layout>
+			</s:List>
+			<s:VGroup width="330" height="630">
+				<mx:SWFLoader id="swfComp" width="320" height="240" />
+				<mx:LinkButton id="viewClipBtn" label="" height="17" />
+				<mx:LinkButton id="viewCreatorBtn" label="" height="17" />			
+				<s:Label id="localUrl" paddingLeft="10" height="27"  width="320" />
+				<components:AdvancedAutoComplete
+					id="tagAutoComplete"
+					allowMultipleSelection="true"
+					allowNewValues="true"
+					showRemoveIcon = "true"
+					autoSelectEnabled = "false"
+					width="320">
+					<components:inlineButton>
+						<mx:Button icon="@Embed(source='/com/hillelcoren/assets/icons/down.png')" click="handleTagButtonClick()"/>
+					</components:inlineButton>
+				</components:AdvancedAutoComplete>
+				<s:Button id="applyBtn" label="Apply" click="applyBtn_clickHandler(event)" />				
+			</s:VGroup>
+		</s:HGroup>
+	</s:VGroup>
+</s:NavigatorContent>

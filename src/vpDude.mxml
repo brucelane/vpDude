@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:WindowedApplication xmlns:fx="http://ns.adobe.com/mxml/2009" 
+					   xmlns:s="library://ns.adobe.com/flex/spark" 
+					   xmlns:mx="library://ns.adobe.com/flex/mx"
+					   xmlns:updater="http://updater.riaspace.com/"
+					   creationComplete="vpDude_creationCompleteHandler(event)" 
+					   width="840" height="670"
+					   currentState="mainView"			   
+					   xmlns:components="components.*">
+	<fx:Style source="css/defaults.css"/>
+	<fx:Script source="Main.as" />
+	<fx:Declarations>
+		<updater:NativeApplicationUpdater id="updater" 
+										  updateURL="https://www.videopong.net/vpdudefiles/update.xml"
+										  isNewerVersionFunction="{isNewerFunction}"										  
+										  initialized="updater_initializedHandler(event)"
+										  updateStatus="updater_updateStatusHandler(event)"										  
+										  error="updater_errorHandler(event)"
+										  downloadError="updater_errorHandler(event)"
+										  updateError="updater_errorHandler(event)"
+										  />
+	</fx:Declarations>
+	
+	<s:states>
+		<s:State name="mainView"/>
+		<s:State name="updaterView"/>
+	</s:states>
+	<s:VGroup paddingLeft="8" paddingBottom="8" paddingRight="8" paddingTop="8">
+		<s:HGroup>
+			<s:BitmapImage id="logo" source="@Embed('../assets/vp-logo.png')" />
+		</s:HGroup>
+		
+		<mx:TabNavigator id="tabNav" includeIn="mainView" 
+						 tabWidth="104"
+						 width="830" height="600"
+						 tabStyleName="tab" selectedTabTextStyleName="selectedTab"
+						 change="tabNav_changeHandler(event)">
+			<components:Config  />
+			<components:About  />
+			<components:Donate  />
+			<components:Quit/>
+		</mx:TabNavigator>
+		<s:HGroup verticalCenter="0" includeIn="updaterView" horizontalCenter="0" verticalAlign="top">
+			<!--<s:BitmapImage source="@Embed(source='/assets/icon128.png')" />-->
+			<s:VGroup width="100%" horizontalAlign="center">
+				<s:Label text="New version ({updater.updateVersion}) is available." />
+				<mx:ProgressBar id="prgBar" source="{updater}" label="Downloading %3%" visible="{downloading}" />
+				<s:Button id="btnNo" label="Cancel" click="btnNo_clickHandler(event)" />
+			</s:VGroup>
+		</s:HGroup>
+	</s:VGroup>
+</s:WindowedApplication>

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:NavigatorContent xmlns:fx="http://ns.adobe.com/mxml/2009" 
+					xmlns:s="library://ns.adobe.com/flex/spark" 
+					xmlns:mx="library://ns.adobe.com/flex/mx" 
+					label=""
+					enabled="false"
+					width="824" height="461"		
+					>
+
+	<s:VGroup width="800" paddingLeft="30" paddingRight="30" paddingTop="30" paddingBottom="30" />
+
+</s:NavigatorContent> 
