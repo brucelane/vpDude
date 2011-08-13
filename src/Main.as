@@ -24,8 +24,6 @@ import flash.net.navigateToURL;
 import flash.system.Capabilities;
 import flash.utils.ByteArray;
 
-import fr.batchass.*;
-
 import mx.collections.ArrayCollection;
 import mx.collections.XMLListCollection;
 import mx.controls.Alert;
@@ -34,6 +32,7 @@ import mx.events.FlexEvent;
 import mx.events.IndexChangedEvent;
 import mx.managers.DragManager;
 
+import fr.batchass.*;
 import videopong.*;
 
 private var monitor:URLMonitor;
