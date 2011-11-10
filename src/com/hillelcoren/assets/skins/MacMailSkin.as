@@ -15,22 +15,22 @@ package com.hillelcoren.assets.skins
 			switch (name) 
 			{
 				case "upSkin":
-					color = 0xDEE7FB;
+					color = 0xEFF2F7;
 					break;
 				case "overSkin":
-					color = 0xBBCEF1;
+					color = 0xe9e9e9;
 					break;
 				case "downSkin":
 				case "selectedUpSkin":
 				case "selectedOverSkin":
 				case "selectedDownSkin":
-					color = 0x598BEC;
+					color = 0xa6a6a6;
 			}
 			
 			var g:Graphics = graphics;
 			g.clear();
 			g.beginFill( color );
-			g.lineStyle( 1, 0xA4BDEC );
+			g.lineStyle( 1, 0xe3e3e3 );
 			g.drawRoundRect( 0, 1, w, h-2, RADIUS );
 			g.endFill();
 		}

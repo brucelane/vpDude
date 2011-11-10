@@ -24,6 +24,8 @@ import flash.net.navigateToURL;
 import flash.system.Capabilities;
 import flash.utils.ByteArray;
 
+import fr.batchass.*;
+
 import mx.collections.ArrayCollection;
 import mx.collections.XMLListCollection;
 import mx.controls.Alert;
@@ -32,7 +34,6 @@ import mx.events.FlexEvent;
 import mx.events.IndexChangedEvent;
 import mx.managers.DragManager;
 
-import fr.batchass.*;
 import videopong.*;
 
 private var monitor:URLMonitor;
@@ -52,11 +53,12 @@ public var vpFullUrl:String = vpUrl;
 public var vpUploadUrl:String = vpUpUrl;
 [Bindable]
 protected var downloading:Boolean = false;
+[Bindable]
+public var currentVersion:String = "";
 
 public var dldFolderPath:String;
 public var dbFolderPath:String;
 public var os:String;
-public var currentVersion:String;
 public var search:Search;
 public var updateTab:UpdateTab;
 public var userName:String;
@@ -221,8 +223,7 @@ private function onMonitor(event:StatusEvent):void
 				tabNav.addChild( updateTab );
 				tabNav.addChild( new About() );	
 				tabNav.addChild( new Quit() );	
-			}
-			
+			}			
 		}	
 	}
 }
@@ -288,7 +289,7 @@ private function urlMonitor(url:String):void
 	monitor.pollInterval = 10000;
 }
 
-public function errorEventErrorHandler(event:ErrorEvent):void
+/*public function errorEventErrorHandler(event:ErrorEvent):void
 {
 	Util.log( 'An ErrorEvent has occured: ' + event.text );
 }    
@@ -300,7 +301,7 @@ public function ioErrorHandler( event:IOErrorEvent ):void
 public function securityErrorHandler( event:SecurityErrorEvent ):void
 {
 	Util.log( "securityErrorHandler: " + event.text );
-}		
+}		*/
 //  after a file upload is complete or attemted the server will return an http status code, code 200 means all is good anything else is bad.
 public function httpStatusHandler( event:HTTPStatusEvent ):void 
 {  

@@ -55,7 +55,8 @@
 						<mx:Button icon="@Embed(source='/com/hillelcoren/assets/icons/down.png')" click="handleTagButtonClick()"/>
 					</components:inlineButton>
 				</components:AdvancedAutoComplete>
-				<s:Button id="applyBtn" label="Apply" click="applyBtn_clickHandler(event)" />				
+				<s:Button id="applyBtn" label="Apply" click="tabSearchApplyBtn_clickHandler(event)" />				
+				<s:Label id="applyLabel" />				
 			</s:VGroup>
 		</s:HGroup>
 	</s:VGroup>

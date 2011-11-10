@@ -58,7 +58,7 @@ private const minFileSize:int = 10000;
 private var waitImage:Class;
 [Embed(source='../assets/previewwait.png')]
 private var previewWaitImage:Class;
-[Embed(source='../assets/previewnotavailable.png')]
+[Embed(source='../assets/nopreview.png')]
 private var previewNotAvailableImage:Class;
 
 private var cache:CacheManager;
@@ -267,8 +267,16 @@ protected function updateDetails():void
 				Util.log( "updateDetails, cachedUrl exists: " + cachedUrl );
 				Util.log( "updateDetails, searchComp: " + searchComp );
 				Util.log( "updateDetails, searchComp.swfComp: " + searchComp.swfComp );
+				Util.log( "updateDetails, cPrev.size: " + cPrev.size );
 				Util.log( "updateDetails, searchComp.swfComp.source before: " + searchComp.swfComp.source );
-				searchComp.swfComp.source = cachedUrl;
+				if ( cPrev.size < 1 )
+				{
+					searchComp.swfComp.source = previewNotAvailableImage;
+				}
+				else
+				{
+					searchComp.swfComp.source = cachedUrl;
+				}
 				Util.log( "updateDetails, searchComp.swfComp.source after: " + searchComp.swfComp.source );
 			}
 		}

@@ -3,11 +3,11 @@
 
         <!-- Mac update -->
         <dmg>
-                <version>0.5.012</version>
+                <version>0.5.1</version>
                 <url>https://www.videopong.net/vpdudefiles/vpDude.dmg</url>
             <description>
             <![CDATA[
-				New in version 0.5.012: 
+				New in version 0.5.1: 
 				* AIR 2.6
                 * This a Mac update
                 ]]>
@@ -16,11 +16,11 @@
         
         <!-- Win update -->
         <exe>
-                <version>0.5.012</version>
+                <version>0.5.1</version>
                 <url>https://www.videopong.net/vpdudefiles/vpDude.exe</url>
             <description>
             <![CDATA[
- 				New in version version 0.5.012: 
+ 				New in version version 0.5.1: 
 				* AIR 2.6
                 * This a Win update
                 ]]>

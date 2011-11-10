@@ -16,6 +16,14 @@ private	var clips:Clips = Clips.getInstance();
 [Bindable]
 private var tags:Tags = Tags.getInstance();
 
+private var timer:Timer;
+
+private function timerFct(event:Event):void
+{
+	applyLabel.text = "";
+	timer.stop();
+
+}
 private function handleButtonClick():void
 {
 	
@@ -42,6 +50,9 @@ protected function search_creationCompleteHandler(event:FlexEvent):void
 	tagAutoComplete.dataProvider = tags.tagsXMLList;
 	
 	clipList.labelField = "@name";
+	timer = new Timer(2500);
+	timer.addEventListener(TimerEvent.TIMER, timerFct);
+
 }
 private function handleTagButtonClick():void
 {	
@@ -57,20 +68,25 @@ private function handleTagButtonClick():void
 	}
 	
 }
-protected function applyBtn_clickHandler(event:MouseEvent):void
+protected function tabSearchApplyBtn_clickHandler(event:MouseEvent):void
 {
-	// write tags to clip and tags XML
-	clips = Clips.getInstance();
-	//remove existing tags
-	clips.removeTags( tagAutoComplete.data.@id );//resets search view!!!
-	//loop in tags and add them to XML db
-	for each ( var oneTag:String in tagAutoComplete.selectedItems )
+	if ( tagAutoComplete.data )
 	{
-		tags = Tags.getInstance();
-		// if tag not already in global tags, add it
-		tags.addTagIfNew( oneTag.toLowerCase() );//no reset:ok
-		
-		//test if tag is not already in clip
-		clips.addTagIfNew( oneTag.toLowerCase(), tagAutoComplete.data.@id, false );//resets search view!!!
+		applyLabel.text = "Tags updated...";
+		// write tags to clip and tags XML
+		clips = Clips.getInstance();
+		//remove existing tags
+		clips.removeTags( tagAutoComplete.data.@id );//resets search view!!!
+		//loop in tags and add them to XML db
+		for each ( var oneTag:String in tagAutoComplete.selectedItems )
+		{
+			tags = Tags.getInstance();
+			// if tag not already in global tags, add it
+			tags.addTagIfNew( oneTag.toLowerCase() );//no reset:ok
+			
+			//test if tag is not already in clip
+			clips.addTagIfNew( oneTag.toLowerCase(), tagAutoComplete.data.@id, false );//resets search view!!!
+		}
+		timer.start();
 	}
 }	

@@ -6,21 +6,16 @@
 					creationComplete="config_creationCompleteHandler(event)"
 					label="config" 
 					>
+	
 	<fx:Script source="TabConfig.as" />
 	<s:states>
 		<s:State name="Normal"/>
 		<s:State name="Busy"/>
 	</s:states>
 		<s:VGroup width="100%" paddingLeft="8" paddingRight="8" paddingTop="8" paddingBottom="8">
-			<!--<s:HGroup>
-				<s:Label width="{lblWidth}" text="Database files path:" verticalAlign="middle"/>
-				<s:TextInput width="{tiWidth}" text="{vpDbPath}" id="dbTextInput"/>
-				<s:Button label="..." id="browseConfigPathBtn" width="30" click="browseConfigPathBtn_clickHandler(event)"/>			
-			</s:HGroup>-->
 			<s:HGroup>
 				<s:Label height="20" paddingTop="6"
 						 text="If you have already a videopong.net account please fill in, otherwise please create one first on"/>
-				<!--<s:Button click="navigateToURL(new URLRequest('http://videopong.net'))" label="videopong.net" />-->
 				<mx:LinkButton label="videopong.net"
 							   click="navigateToURL(new URLRequest('http://videopong.net'))"
 							   paddingLeft="0" verticalCenter="10"/>
@@ -41,7 +36,7 @@
 			</s:HGroup>
 			<s:HGroup>
 				<s:Label width="{lblWidth}" text="Preview size (default 320x240):" verticalAlign="bottom"/>
-				<s:TextInput width="{tiWidth}" text="{reso}" id="resoTextInput"/>
+				<s:TextInput width="{tiWidth}" text="{cnv.reso}" id="resoTextInput"/>
 			</s:HGroup>
 			<s:HGroup>
 				<s:Spacer width="{lblWidth}" />
@@ -50,11 +45,20 @@
 			<s:HGroup>
 				<s:Spacer width="{lblWidth}" />
 				<s:Button label="Sync my own folder" label.Busy="Sync in progress.." enabled.Busy="false" width="200" toolTip="resync my own files" id="resyncBtn" click="resyncBtn_clickHandler(event)"/>
-				<s:Label id="syncStatus" verticalAlign="bottom"/>
+				<s:Label id="syncStatus" text="{cnv.status}" verticalAlign="bottom"/>
 			</s:HGroup>
 			<s:VGroup width="100%" height="100%" paddingBottom="5" paddingLeft="5" paddingRight="5" paddingTop="5">
-				<s:TextArea id="log" width="100%" height="100"/>
-				<s:TextArea id="ffout" width="100%" height="250"/>
+				<s:TextArea id="log" width="100%" height="100" change="log_changeHandler(event)" />
+				<s:HGroup>
+					<s:VGroup visible="{showProgress}">						
+						<s:Label width="{lblWidth}" text="New {cnv.countNew}" verticalAlign="bottom"/>
+						<s:Label width="{lblWidth}" text="Changed {cnv.countChanged}" verticalAlign="bottom"/>
+						<s:Label width="{lblWidth}" text="Deleted {cnv.countDeleted}" verticalAlign="bottom"/>
+						<s:Label width="{lblWidth}" text="NoChange {cnv.countNoChange}" verticalAlign="bottom"/>
+						<s:Label width="{lblWidth}" text="Error {cnv.countError}" verticalAlign="bottom"/>
+					</s:VGroup>
+					<s:TextArea id="ffout" text="{cnv.summary}" width="500" height="250"/>
+					</s:HGroup>
 				<s:Button label="Clear console text" click="log.text=''" />
 			</s:VGroup>			
 		</s:VGroup>
