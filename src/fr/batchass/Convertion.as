@@ -272,7 +272,6 @@ package fr.batchass
 		{
 			progress += "ThumbConvert Completed:" + clip.clipGeneratedName + "\n";
 			generate( clip, false );
-
 		}
 		private function onMovieConvertComplete(clip:Clip):void
 		{
@@ -332,6 +331,7 @@ package fr.batchass
 				if ( countAvail > 0 ) summary += " [" + availSwfs + "]\n" else summary += "\n";
 				
 				dispatchEvent( new Event(Event.COMPLETE) );	
+				busy = false;
 			}
 		}
 		
