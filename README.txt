@@ -1,1 +1,1 @@
-AIR 2.6 version for Win, Mac, Linux
+AIR 3.2 version for Win, Mac
