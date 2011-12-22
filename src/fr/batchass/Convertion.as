@@ -248,11 +248,9 @@ package fr.batchass
 					// modify clips.xml
 					clips.deleteClip( clip.clipGeneratedName, clip.clipRelativePath );
 					// generate new files
-					//newClips.push({clipName:clip.clipGeneratedName,ownXml:clipXml,cPath:clip.clipPath});
-					//New
-					fileToConvert.push( clip ); //TODO TO BE CHECKED
-					clips.addNewClip( clip.clipGeneratedName, clipXml, clip.clipPath );
-					//End new
+					fileToConvert.push( clip ); 
+					//TODO TO BE CHECKED if done twice
+					//clips.addNewClip( clip.clipGeneratedName, clipXml, clip.clipPath );
 					countChanged++;
 					countDone++;
 					chgFiles += clip.clipGeneratedTitle + " ";
@@ -293,12 +291,9 @@ package fr.batchass
 					OWN_CLIPS_XML.tags.appendChild( folderXmlTag );
 				}
 			}
-			//newClips.push({clipName:clip.clipGeneratedName,ownXml:OWN_CLIPS_XML,cPath:clip.clipPath});
 			// we now create clip XML when thumb and swf are successfully generated
 			var clips:Clips = Clips.getInstance();
-			//clips.addNewClip( newClips[0].clipName, newClips[0].ownXml, newClips[0].cPath );
 			clips.addNewClip( clip.clipGeneratedName, OWN_CLIPS_XML, clip.clipPath );
-			//newClips.shift();
 		}
 		
 		
@@ -327,20 +322,9 @@ package fr.batchass
 						if( sourceFile.exists )
 						{
 							// it's a thumb (TODO verify)
-							//file: copy							
-							var destFile:File = new File( fileToConvert[0].thumbsPath + "thumb2.jpg" );
-							sourceFile.addEventListener( IOErrorEvent.IO_ERROR, ioErrorHandler );
-							sourceFile.addEventListener( SecurityErrorEvent.SECURITY_ERROR, securityErrorHandler );
-							try 
-							{
-								sourceFile.copyTo( destFile );
-								var destFile2:File = new File( fileToConvert[0].thumbsPath + "thumb3.jpg" );
-								sourceFile.copyTo( destFile2 );
-							}
-							catch (error:Error)
-							{
-								Util.errorLog( "errorOutputDataHandler Error:" + error.message );
-							}
+							//file: copy
+							copyFile( thumb1, fileToConvert[0].thumbsPath + "thumb2.jpg" );
+							copyFile( thumb1, fileToConvert[0].thumbsPath + "thumb3.jpg" );
 						}
 						else
 						{
@@ -361,10 +345,10 @@ package fr.batchass
 			}
 			if (data.indexOf("Unknown format")>-1)
 			{ 
+				busy = false;
 				// TODO verify
 				countError++;
 				errFiles += currentFilename + " ";
-				busy = false;
 			}
 			Util.ffMpegErrorLog( "NativeProcess errorOutputDataHandler: " + data );
 		}
@@ -386,7 +370,7 @@ package fr.batchass
 			currentFilename = "";
 
 		}
-		public function copySwf( src:String, dest:String ):void
+		public function copyFile( src:String, dest:String ):void
 		{
 			var sourceFile:File = new File( src );
 			var destFile:File = new File( dest );
@@ -398,14 +382,11 @@ package fr.batchass
 			}
 			catch (error:Error)
 			{
-				Util.errorLog( "copySwf Error:" + error.message );
-			}
-			
+				Util.errorLog( "copyFile Error:" + error.message );
+			}			
 		}
 		
 		// convertion
-		//private function generatePreview( ownVideoPath:String, swfPath:String, clipGeneratedName:String, clipFileName:String ):void
-		//private function convert( ownVideoPath:String, clipGeneratedName:String, clipFileName:String, thumb:Boolean ):void
 		private function convert( clip:Clip ):void
 		{
 			generate( clip, true );
@@ -440,7 +421,7 @@ package fr.batchass
 					countError++;
 					countDone++;
 					errFiles += clip.clipGeneratedTitle + " ";
-					copySwf( clip.clipPath, outPath + clip.clipGeneratedName + ".swf" );
+					copyFile( clip.clipPath, outPath + clip.clipGeneratedName + ".swf" );
 				}
 			}
 			else
@@ -451,10 +432,6 @@ package fr.batchass
 					if ( !ffMpegExecutable.exists )
 					{
 						Util.log( "convertion, ffMpegExecutable does not exist: " + FlexGlobals.topLevelApplication.vpFFMpegExePath );
-					}
-					else
-					{
-						Util.log( "convertion, ffMpegExecutable exists: " + FlexGlobals.topLevelApplication.vpFFMpegExePath );
 					}
 					//configComp.ffout.text += "generatePreview, converting " + clipFileName + " to swf.\n";
 					Util.ffMpegOutputLog( "NativeProcess convertion: Converting " + clip.clipGeneratedName + "\n" );
