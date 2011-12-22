@@ -28,7 +28,7 @@ package fr.batchass
 		public var currentFilename:String = "";
 		private var currentThumb:int;
 		private var thumb1:String;
-		private var _status:String;
+		private var _status:String = "idle";
 		//public var tPath:String;
 
 		private var _busy:Boolean = false;
@@ -68,96 +68,12 @@ package fr.batchass
 			timer.addEventListener(TimerEvent.TIMER, processConvert);
 			//timer.start();
 		}
-		
-		[Bindable]
-		public function get summary():String
-		{
-			return _summary;
-		}
 
-		public function set summary(value:String):void
-		{
-			_summary = value;
-		}
-		[Bindable]
-		public function get progress():String
-		{
-			return _progress;
-		}
-
-		public function set progress(value:String):void
-		{
-			_progress += value;
-		}
-
-		[Bindable(event="busyChange")]
-		public function get busy():Boolean
-		{
-			return _busy;
-		}
-
-		public function set busy(value:Boolean):void
-		{
-			if( _busy !== value)
-			{
-				_busy = value;
-				dispatchEvent(new Event(Event.ADDED));
-			}
-		}
-
-		[Bindable(event="statusChange")]
-		public function get status():String
-		{
-			return _status;
-		}
-
-		public function set status(value:String):void
-		{
-			if( _status !== value)
-			{
-				_status = value;
-				dispatchEvent(new Event(Event.CHANGE));
-			}
-		}
-
-		public static function getInstance():Convertion
-		{
-			if (instance == null)
-			{
-				instance = new Convertion();
-			}
-			
-			return instance;
-		}
-		
-		public function addEventListener(type:String, listener:Function, useCapture:Boolean=false, priority:int=0, useWeakReference:Boolean=false):void
-		{
-			dispatcher.addEventListener(type, listener, useCapture, priority);
-		}
-		
-		public function removeEventListener(type:String, listener:Function, useCapture:Boolean=false):void
-		{
-			dispatcher.removeEventListener(type, listener, useCapture);
-		}
-		
-		public function dispatchEvent(event:Event):Boolean
-		{
-			return dispatcher.dispatchEvent(event);
-		}
-		
-		public function hasEventListener(type:String):Boolean
-		{
-			return dispatcher.hasEventListener(type);
-		}
-		
-		public function willTrigger(type:String):Boolean
-		{
-			return dispatcher.willTrigger(type);
-		}
 		private function processConvert(event:Event): void 
 		{
-			//TODO VERIFY if useless dispatchEvent( new Event(Event.CHANGE) );
+			dispatchEvent( new Event(Event.CHANGE) );
 			status = "(" + countDone + "/" + countTotal + ")";
+			Util.convertLog( "processConvert, status:" + status );
 			
 			var freeSpace:Number = Math.round( File.applicationStorageDirectory.spaceAvailable / 1048576 );
 			if ( freeSpace < 10 )
@@ -171,31 +87,8 @@ package fr.batchass
 					if ( fileToConvert.length > 0 )
 					{
 						busy = true;
+						Util.convertLog( "processConvert, fileToConvert.length:" + fileToConvert.length );
 						convert( fileToConvert[0] );
-						//fileToConvert.shift();
-					}
-					else
-					{													
-						// all is converted and finished
-						/*summary = "Completed:\n"; // [" + allFiles + "]\n";
-						var availSwfs:String = newFiles + chgFiles + nochgFiles;
-						var countAvail:int = countNew + countChanged + countNoChange;
-						summary += "- newly indexed: " + countNew + " clip(s)";
-						if ( countNew > 0 )	summary += " [" + newFiles + "]\n" else summary += "\n";
-						summary += "- changed: " + countChanged + " clip(s)";
-						if ( countChanged > 0 )	summary += " [" + chgFiles + "]\n" else summary += "\n";
-						summary += "- deleted: " + countDeleted + " clip(s)";
-						if ( countDeleted > 0 )	summary += " [" + delFiles + "]\n" else summary += "\n";
-						summary += "- no change: " + countNoChange + " clip(s)";
-						if ( countNoChange > 0 ) summary += " [" + nochgFiles + "]\n" else summary += "\n";
-						if ( countError > 0 )
-						{
-							summary += "- could not convert thumbs and preview: " + countError + " clip(s) [" + errFiles + "]\n";
-						}
-						summary += "- available as swf: " + countAvail + " clip(s)";
-						if ( countAvail > 0 ) summary += " [" + availSwfs + "]\n" else summary += "\n";
-
-						dispatchEvent( new Event(Event.COMPLETE) );*/													
 					}
 				}
 				else
@@ -203,16 +96,14 @@ package fr.batchass
 					//busy
 					if ( !startFFMpegProcess.running ) 
 					{
+						Util.convertLog( "processConvert, startFFMpegProcess not running, busy becomes false" );
 						busy = false;
-					}
-					else
-					{
-						trace("ruunnnning");
 					}
 				}
 				
 				if ( fileToConvert.length == 0 )
 				{
+					Util.convertLog( "processConvert, fileToConvert.length == 0, busy becomes false" );
 					busy = false;
 				}				
 				
@@ -231,7 +122,10 @@ package fr.batchass
 			{
 				countNew++;
 				newFiles += clip.clipGeneratedTitle + " ";
+
 				fileToConvert.push( clip );
+				Util.convertLog( "addFileToConvert, new clip:" + clip.clipGeneratedTitle );
+				Util.convertLog( "addFileToConvert, fileToConvert.length:" + fileToConvert.length );
 			}
 			else
 			{
@@ -256,6 +150,8 @@ package fr.batchass
 					clips.deleteClip( clip.clipGeneratedName, clip.clipRelativePath );
 					// generate new files
 					fileToConvert.push( clip ); 
+					Util.convertLog( "addFileToConvert, changed clip:" + clip.clipGeneratedTitle );
+					Util.convertLog( "addFileToConvert, fileToConvert.length:" + fileToConvert.length );
 					countChanged++;
 					countDone++;
 					chgFiles += clip.clipGeneratedTitle + " ";
@@ -271,11 +167,15 @@ package fr.batchass
 		private function onThumbConvertComplete(clip:Clip):void
 		{
 			progress += "ThumbConvert Completed:" + clip.clipGeneratedName + "\n";
+			Util.convertLog( "onThumbConvertComplete, ThumbConvert Completed:" + clip.clipGeneratedTitle );
+			Util.convertLog( "onThumbConvertComplete, fileToConvert.length:" + fileToConvert.length );
 			generate( clip, false );
 		}
 		private function onMovieConvertComplete(clip:Clip):void
 		{
 			progress += "MovieConvert Completed:" + clip.clipGeneratedName + "\n";
+			Util.convertLog( "onMovieConvertComplete, MovieConvert Completed:" + clip.clipGeneratedTitle );
+			Util.convertLog( "onMovieConvertComplete, fileToConvert.length:" + fileToConvert.length );
 			// create XML
 			OWN_CLIPS_XML = <video id={clip.clipGeneratedName} urllocal={clip.clipRelativePath} datemodified={clip.clipModificationDate} size={clip.clipSize}> 
 								<urlthumb1>{clip.thumbsPath + "thumb1.jpg"}</urlthumb1>
@@ -305,9 +205,12 @@ package fr.batchass
 			// we now create clip XML when thumb and swf are successfully generated
 			var clips:Clips = Clips.getInstance();
 			clips.addNewClip( clip.clipGeneratedName, OWN_CLIPS_XML, clip.clipPath );
+			countDone++;
 			if ( fileToConvert.length > 0 ) 
 			{
 				fileToConvert.shift();
+				Util.convertLog( "onMovieConvertComplete, fileToConvert.shift" );
+				Util.convertLog( "onMovieConvertComplete, fileToConvert.length:" + fileToConvert.length );
 			}
 			else
 			{
@@ -331,11 +234,9 @@ package fr.batchass
 				if ( countAvail > 0 ) summary += " [" + availSwfs + "]\n" else summary += "\n";
 				
 				dispatchEvent( new Event(Event.COMPLETE) );	
-				busy = false;
 			}
+			busy = false;
 		}
-		
-		
 		
 		private function processClose(event:Event):void
 		{
@@ -366,7 +267,7 @@ package fr.batchass
 					}
 					onThumbConvertComplete(fileToConvert[0]);
 				}
-				busy = false;
+				//loop busy = false;
 			}
 			if (data.indexOf("swf: I/O error occurred")>-1)
 			{ 
@@ -385,7 +286,7 @@ package fr.batchass
 				countError++;
 				errFiles += currentFilename + " ";
 			}
-			Util.ffMpegErrorLog( "NativeProcess errorThumbDataHandler: " + data );
+			Util.ffMpegOutputLog( "NativeProcess errorThumbDataHandler: " + data );
 		}
 		// movie convert progress
 		private function errorMovieDataHandler(event:ProgressEvent):void
@@ -415,7 +316,7 @@ package fr.batchass
 				countError++;
 				errFiles += currentFilename + " ";
 			}
-			Util.ffMpegErrorLog( "NativeProcess errorMovieDataHandler: " + data );
+			Util.ffMpegOutputLog( "NativeProcess errorMovieDataHandler: " + data );
 		}
 		public function start():void
 		{
@@ -437,6 +338,7 @@ package fr.batchass
 		}
 		public function copyFile( src:String, dest:String ):void
 		{
+			Util.log( "copyFile src:" + src + ", dest:" +dest );
 			var sourceFile:File = new File( src );
 			var destFile:File = new File( dest );
 			sourceFile.addEventListener( IOErrorEvent.IO_ERROR, ioErrorHandler );
@@ -504,7 +406,7 @@ package fr.batchass
 					
 					var nativeProcessStartupInfo:NativeProcessStartupInfo = new NativeProcessStartupInfo();
 					nativeProcessStartupInfo.executable = ffMpegExecutable;
-					Util.log("convertion,ff path:"+ ffMpegExecutable.nativePath );			
+					//Util.log("convertion,ff path:"+ ffMpegExecutable.nativePath );			
 					var processArgs:Vector.<String> = new Vector.<String>();
 					var i:int = 0;
 					processArgs[i++] = "-i";
@@ -553,7 +455,7 @@ package fr.batchass
 				}
 				catch (e:Error)
 				{
-					Util.log( "convertion, NativeProcess Error: " + e.message );
+					Util.errorLog( "convertion, NativeProcess Error: " + e.message );
 					busy = false;
 				}	
 			}
@@ -584,6 +486,92 @@ package fr.batchass
 			//resetConsole();
 			//configComp.log.text += data;
 			Util.ffMpegOutputLog( "NativeProcess outputDataHandler: " + data );
+		}
+		
+		[Bindable]
+		public function get summary():String
+		{
+			return _summary;
+		}
+		
+		public function set summary(value:String):void
+		{
+			_summary = value;
+		}
+		[Bindable]
+		public function get progress():String
+		{
+			return _progress;
+		}
+		
+		public function set progress(value:String):void
+		{
+			_progress += value;
+		}
+		
+		[Bindable(event="busyChange")]
+		public function get busy():Boolean
+		{
+			return _busy;
+		}
+		
+		public function set busy(value:Boolean):void
+		{
+			if( _busy !== value)
+			{
+				_busy = value;
+				dispatchEvent(new Event(Event.ADDED));
+			}
+		}
+		
+		[Bindable(event="statusChange")]
+		public function get status():String
+		{
+			return _status;
+		}
+		
+		public function set status(value:String):void
+		{
+			if( _status !== value)
+			{
+				_status = value;
+				dispatchEvent(new Event(Event.CHANGE));
+			}
+		}
+		
+		public static function getInstance():Convertion
+		{
+			if (instance == null)
+			{
+				instance = new Convertion();
+			}
+			
+			return instance;
+		}
+		
+		public function addEventListener(type:String, listener:Function, useCapture:Boolean=false, priority:int=0, useWeakReference:Boolean=false):void
+		{
+			dispatcher.addEventListener(type, listener, useCapture, priority);
+		}
+		
+		public function removeEventListener(type:String, listener:Function, useCapture:Boolean=false):void
+		{
+			dispatcher.removeEventListener(type, listener, useCapture);
+		}
+		
+		public function dispatchEvent(event:Event):Boolean
+		{
+			return dispatcher.dispatchEvent(event);
+		}
+		
+		public function hasEventListener(type:String):Boolean
+		{
+			return dispatcher.hasEventListener(type);
+		}
+		
+		public function willTrigger(type:String):Boolean
+		{
+			return dispatcher.willTrigger(type);
 		}
 		private function ioErrorHandler( event:IOErrorEvent ):void
 		{

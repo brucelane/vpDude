@@ -10,6 +10,7 @@ package fr.batchass
 	{
 		private static var dateFormatter:DateFormatter;
 		private static var millisDateFormatter:DateFormatter;
+		private static var millisTimeFormatter:DateFormatter;
 		private static var _nowDate:String;
 		private static var _sessionDate:String;
 		
@@ -26,7 +27,7 @@ package fr.batchass
 			var fileStream:FileStream = new FileStream();
 			fileStream.open( file, fileMode );
 			
-			fileStream.writeMultiByte( text + "\n", File.systemCharset );
+			fileStream.writeMultiByte( nowTime + "\t" + text + "\n", File.systemCharset );
 			fileStream.close();
 			trace( text );
 			
@@ -40,7 +41,7 @@ package fr.batchass
 			var fileStream:FileStream = new FileStream();
 			fileStream.open( file, fileMode );
 			
-			fileStream.writeMultiByte( text + "\n", File.systemCharset );
+			fileStream.writeMultiByte( nowTime + "\t" + text + "\n", File.systemCharset );
 			fileStream.close();
 			trace( text );
 			
@@ -54,7 +55,21 @@ package fr.batchass
 			var fileStream:FileStream = new FileStream();
 			fileStream.open( file, fileMode );
 			
-			fileStream.writeMultiByte( text + "\n", File.systemCharset );
+			fileStream.writeMultiByte( nowTime + "\t" + text + "\n", File.systemCharset );
+			fileStream.close();
+			//trace( text );
+			
+		} 
+		public static function convertLog( text:String, clear:Boolean=false ):void
+		{
+			
+			var file:File = File.applicationStorageDirectory.resolvePath( "convert-" + sessionDate + ".log" );
+			var fileMode:String = ( clear ? FileMode.WRITE : FileMode.APPEND );
+			
+			var fileStream:FileStream = new FileStream();
+			fileStream.open( file, fileMode );
+			
+			fileStream.writeMultiByte( nowTime + "\t" + text + "\n", File.systemCharset );
 			fileStream.close();
 			trace( text );
 			
@@ -69,37 +84,9 @@ package fr.batchass
 			var fileStream:FileStream = new FileStream();
 			fileStream.open( file, fileMode );
 			
-			fileStream.writeMultiByte( text + "\n", File.systemCharset );
+			fileStream.writeMultiByte( nowTime + "\t" + text + "\n", File.systemCharset );
 			fileStream.close();
-			trace( text );
-			
-		} 
-		public static function ffMpegErrorLog( text:String, clear:Boolean=false ):void
-		{
-			
-			var file:File = File.applicationStorageDirectory.resolvePath( "ffmpegerror-" + sessionDate + ".log" );
-			var fileMode:String = ( clear ? FileMode.WRITE : FileMode.APPEND );
-			
-			var fileStream:FileStream = new FileStream();
-			fileStream.open( file, fileMode );
-			
-			fileStream.writeMultiByte( text + "\n", File.systemCharset );
-			fileStream.close();
-			trace( text );
-			
-		} 
-		public static function ffMpegMovieErrorLog( text:String, clear:Boolean=false ):void
-		{
-			
-			var file:File = File.applicationStorageDirectory.resolvePath( "ffmpegmovieerror-" + sessionDate + ".log" );
-			var fileMode:String = ( clear ? FileMode.WRITE : FileMode.APPEND );
-			
-			var fileStream:FileStream = new FileStream();
-			fileStream.open( file, fileMode );
-			
-			fileStream.writeMultiByte( text + "\n", File.systemCharset );
-			fileStream.close();
-			trace( text );
+			//trace( text );
 			
 		} 
 		public static function get nowDate():String
@@ -111,6 +98,15 @@ package fr.batchass
 			}
 			_nowDate = millisDateFormatter.format(new Date());	
 			return _nowDate;
+		}
+		public static function get nowTime():String
+		{
+			if ( !millisTimeFormatter )
+			{
+				millisTimeFormatter = new DateFormatter();
+				millisTimeFormatter.formatString = "HHhNNmnSSsQQQ";
+			}
+			return millisTimeFormatter.format(new Date());
 		}
 		
 		public static function get sessionDate():String

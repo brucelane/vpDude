@@ -113,10 +113,9 @@ protected function vpDude_creationCompleteHandler(event:FlexEvent):void
 	//clear log files
 	Util.log( "NativeProcess.isSupported:" + NativeProcess.isSupported );
 	Util.errorLog( "Start", true );
-	Util.ffMpegErrorLog( "Start", true );
-	Util.ffMpegMovieErrorLog( "Start", true );
 	Util.ffMpegOutputLog( "Start", true );
 	Util.cacheLog( "Start", true );
+	Util.convertLog( "Start", true );
 	urlMonitor( vpRootUrl );
 	checkFFMpeg();
 

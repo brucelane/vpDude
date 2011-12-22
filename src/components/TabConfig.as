@@ -35,6 +35,18 @@ private var hiddenPassword:String = "";
 private var vpDbPath:String = "";
 [Bindable]
 private var showProgress:Boolean = false;
+[Bindable]
+private var status:String = "";
+[Bindable]
+private var countNew:String = "";
+[Bindable]
+private var countChanged:String = "";
+[Bindable]
+private var countDeleted:String = "";
+[Bindable]
+private var countNoChange:String = "";
+[Bindable]
+private var countError:String = "";
 
 private var password:String = "";
 private var passwordChanged:Boolean = false;
@@ -270,6 +282,7 @@ protected function exploreBtn_clickHandler(event:MouseEvent):void
 
 private function busyChange(event:Event):void
 {
+	Util.convertLog( "busyChange:" + cnv.busy );
 	if ( cnv.busy )
 	{
 		setCurrentState("Busy");	
@@ -282,8 +295,16 @@ private function busyChange(event:Event):void
 }
 private function resyncComplete(event:Event):void
 {
-	cnv = Convertion.getInstance(); 
 	cnv.removeEventListener( Event.COMPLETE, resyncComplete );
+}
+private function statusChange(event:Event):void
+{
+	status = cnv.status;
+	countNew = cnv.countNew + " new";
+	countChanged = cnv.countChanged + " changed";
+	countDeleted = cnv.countDeleted + " deleted";
+	countNoChange = cnv.countNoChange + " has no change";
+	countError = cnv.countError + " error(s)";
 }
 private function resetConsole():void
 {
@@ -294,8 +315,9 @@ protected function resyncBtn_clickHandler(event:MouseEvent):void
 {
 	showProgress = true;
 	cnv = Convertion.getInstance(); 
-	cnv.addEventListener( Event.COMPLETE, resyncComplete );
-	cnv.addEventListener( Event.ADDED, busyChange );
+	cnv.addEventListener( Event.ADDED, resyncComplete );
+	cnv.addEventListener( Event.COMPLETE, busyChange );
+	cnv.addEventListener( Event.CHANGE, statusChange );
 	log.text = "";
 	ffout.text = "";
 	if ( parentDocument.ownFolderPath != ownTextInput.text ) 
