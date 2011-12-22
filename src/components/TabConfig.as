@@ -299,7 +299,7 @@ private function resyncComplete(event:Event):void
 }
 private function statusChange(event:Event):void
 {
-	status = cnv.status;
+	status = cnv.status + " clips converted";
 	countNew = cnv.countNew + " new";
 	countChanged = cnv.countChanged + " changed";
 	countDeleted = cnv.countDeleted + " deleted";
@@ -331,7 +331,7 @@ protected function resyncBtn_clickHandler(event:MouseEvent):void
 	ownFiles = new ArrayCollection( selectedDirectory.getDirectoryListing() );
 	
 	parentDocument.statusText.text = "Found " + ownFiles.length + " file(s)";
-	syncStatus.text = "";
+	//syncStatus.text = "";
 	// delete inexistent files from db
 	var clips:Clips = Clips.getInstance();
 	var clipList:XMLList = clips.CLIPS_XML..video as XMLList;

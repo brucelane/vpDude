@@ -28,7 +28,7 @@ package fr.batchass
 		public var currentFilename:String = "";
 		private var currentThumb:int;
 		private var thumb1:String;
-		private var _status:String = "idle";
+		private var _status:String = "";
 		//public var tPath:String;
 
 		private var _busy:Boolean = false;
@@ -73,7 +73,7 @@ package fr.batchass
 		{
 			dispatchEvent( new Event(Event.CHANGE) );
 			status = "(" + countDone + "/" + countTotal + ")";
-			Util.convertLog( "processConvert, status:" + status );
+			//Util.convertLog( "processConvert, status:" + status );
 			
 			var freeSpace:Number = Math.round( File.applicationStorageDirectory.spaceAvailable / 1048576 );
 			if ( freeSpace < 10 )
@@ -166,14 +166,14 @@ package fr.batchass
 		}
 		private function onThumbConvertComplete(clip:Clip):void
 		{
-			progress += "ThumbConvert Completed:" + clip.clipGeneratedName + "\n";
+			progress = "ThumbConvert Completed:" + clip.clipGeneratedName + "\n";
 			Util.convertLog( "onThumbConvertComplete, ThumbConvert Completed:" + clip.clipGeneratedTitle );
 			Util.convertLog( "onThumbConvertComplete, fileToConvert.length:" + fileToConvert.length );
 			generate( clip, false );
 		}
 		private function onMovieConvertComplete(clip:Clip):void
 		{
-			progress += "MovieConvert Completed:" + clip.clipGeneratedName + "\n";
+			progress = "MovieConvert Completed:" + clip.clipGeneratedName + "\n";
 			Util.convertLog( "onMovieConvertComplete, MovieConvert Completed:" + clip.clipGeneratedTitle );
 			Util.convertLog( "onMovieConvertComplete, fileToConvert.length:" + fileToConvert.length );
 			// create XML
@@ -253,7 +253,7 @@ package fr.batchass
 			{
 				if ( fileToConvert.length > 0 )
 				{					
-					progress += "Thumb convertion completed: " + fileToConvert[0].name + "\n";
+					progress = "Thumb convertion completed: " + fileToConvert[0].name + "\n";
 					thumb1 = fileToConvert[0].thumbsPath + "thumb1.jpg";
 					if ( thumb1.length > 0 )
 					{
@@ -271,7 +271,7 @@ package fr.batchass
 			}
 			if (data.indexOf("swf: I/O error occurred")>-1)
 			{ 
-				if ( fileToConvert.length > 0 ) progress += "Thumb convertion: I/O error occurred: " + fileToConvert[0].name + "\n";
+				if ( fileToConvert.length > 0 ) progress = "Thumb convertion: I/O error occurred: " + fileToConvert[0].name + "\n";
 				busy = false;
 				// TODO verify
 				countError++;
@@ -280,7 +280,7 @@ package fr.batchass
 			}
 			if (data.indexOf("Unknown format")>-1)
 			{ 
-				if ( fileToConvert.length > 0 ) progress += "Thumb convertion: Unknown format: " + fileToConvert[0].name + "\n";
+				if ( fileToConvert.length > 0 ) progress = "Thumb convertion: Unknown format: " + fileToConvert[0].name + "\n";
 				busy = false;
 				// TODO verify
 				countError++;
@@ -297,21 +297,21 @@ package fr.batchass
 			{
 				if ( fileToConvert.length > 0 )
 				{					
-					progress += "Movie convertion completed: " + fileToConvert[0].name + "\n";
+					progress = "Movie convertion completed: " + fileToConvert[0].name + "\n";
 					onMovieConvertComplete(fileToConvert[0]);
 				}
 				busy = false;
 			}
 			if (data.indexOf("swf: I/O error occurred")>-1)
 			{ 
-				if ( fileToConvert.length > 0 ) progress += "Movie convertion swf: I/O error occurred: " + fileToConvert[0].name + "\n";
+				if ( fileToConvert.length > 0 ) progress = "Movie convertion swf: I/O error occurred: " + fileToConvert[0].name + "\n";
 				busy = false;
 				countError++;
 				errFiles += currentFilename + " ";
 			}
 			if (data.indexOf("Unknown format")>-1)
 			{ 
-				if ( fileToConvert.length > 0 ) progress += "Movie convertion: Unknown format: " + fileToConvert[0].name + "\n";
+				if ( fileToConvert.length > 0 ) progress = "Movie convertion: Unknown format: " + fileToConvert[0].name + "\n";
 				busy = false;
 				countError++;
 				errFiles += currentFilename + " ";
@@ -334,11 +334,12 @@ package fr.batchass
 			errFiles = "";
 			allFiles = "";
 			currentFilename = "";
+			status = "";
 			timer.start();
 		}
 		public function copyFile( src:String, dest:String ):void
 		{
-			Util.log( "copyFile src:" + src + ", dest:" +dest );
+			//Util.log( "copyFile src:" + src + ", dest:" +dest );
 			var sourceFile:File = new File( src );
 			var destFile:File = new File( dest );
 			sourceFile.addEventListener( IOErrorEvent.IO_ERROR, ioErrorHandler );
@@ -350,7 +351,7 @@ package fr.batchass
 			catch (error:Error)
 			{
 				Util.errorLog( "copyFile Error:" + error.message );
-				progress += "copyFile Error:" + error.message + "\n";
+				progress = "copyFile Error:" + error.message + "\n";
 			}			
 		}
 		
@@ -358,7 +359,6 @@ package fr.batchass
 		private function convert( clip:Clip ):void
 		{
 			generate( clip, true );
-			//generate( clip, false );
 		}
 		private function generate( clip:Clip, thumb:Boolean ):void
 		{
@@ -425,7 +425,7 @@ package fr.batchass
 						processArgs[i++] =  "-s";
 						processArgs[i++] = "100x74"; //Frame size must be a multiple of 2
 						processArgs[i++] =  "-ss";
-						processArgs[i++] = "1";//thumbNumber.toString();
+						processArgs[i++] = "10";//thumbNumber.toString();
 						processArgs[i++] = outPath + "thumb1.jpg";
 					} 
 					else 

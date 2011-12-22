@@ -7,13 +7,16 @@ import components.TagEdit;
 
 import flash.display.BitmapData;
 import flash.display.Graphics;
+import flash.display.Loader;
 import flash.display.NativeWindow;
 import flash.display.NativeWindowInitOptions;
 import flash.events.Event;
 import flash.events.FocusEvent;
+import flash.events.IOErrorEvent;
 import flash.events.KeyboardEvent;
 import flash.events.MouseEvent;
 import flash.filesystem.File;
+import flash.net.URLRequest;
 
 import fr.batchass.*;
 

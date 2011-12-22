@@ -50,7 +50,7 @@
 				<s:TextArea id="log" text="{cnv.progress}"  width="100%" height="100" change="log_changeHandler(event)" />
 				<s:HGroup>
 					<s:VGroup visible="{showProgress}">						
-						<s:Label id="syncStatus" text="{status}" verticalAlign="bottom"/>
+						<s:Label width="{lblWidth}" text="{status}" verticalAlign="bottom"/>
 						<s:Label width="{lblWidth}" text="{countNew}" verticalAlign="bottom"/>
 						<s:Label width="{lblWidth}" text="{countChanged}" verticalAlign="bottom"/>
 						<s:Label width="{lblWidth}" text="{countDeleted}" verticalAlign="bottom"/>
