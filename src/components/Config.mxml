@@ -48,7 +48,7 @@
 				<s:Label id="syncStatus" text="{cnv.status}" verticalAlign="bottom"/>
 			</s:HGroup>
 			<s:VGroup width="100%" height="100%" paddingBottom="5" paddingLeft="5" paddingRight="5" paddingTop="5">
-				<s:TextArea id="log" width="100%" height="100" change="log_changeHandler(event)" />
+				<s:TextArea id="log" text="{cnv.progress}"  width="100%" height="100" change="log_changeHandler(event)" />
 				<s:HGroup>
 					<s:VGroup visible="{showProgress}">						
 						<s:Label width="{lblWidth}" text="New {cnv.countNew}" verticalAlign="bottom"/>

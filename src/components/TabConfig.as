@@ -284,12 +284,6 @@ private function resyncComplete(event:Event):void
 {
 	cnv = Convertion.getInstance(); 
 	cnv.removeEventListener( Event.COMPLETE, resyncComplete );
-	
-	/*if ( log && cnv.countTotal > 0 )
-	{	
-		ffout.text = cnv.summary;
-	}*/
-	
 }
 private function resetConsole():void
 {

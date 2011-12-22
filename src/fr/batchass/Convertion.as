@@ -33,6 +33,7 @@ package fr.batchass
 
 		private var _busy:Boolean = false;
 		private var _summary:String;
+		private var _progress:String;
 		
 		[Bindable]
 		public var countNew:int = 0;
@@ -65,7 +66,7 @@ package fr.batchass
 			dispatcher = new EventDispatcher(this);
 			timer = new Timer(1000);
 			timer.addEventListener(TimerEvent.TIMER, processConvert);
-			timer.start();
+			//timer.start();
 		}
 		
 		[Bindable]
@@ -77,6 +78,16 @@ package fr.batchass
 		public function set summary(value:String):void
 		{
 			_summary = value;
+		}
+		[Bindable]
+		public function get progress():String
+		{
+			return _progress;
+		}
+
+		public function set progress(value:String):void
+		{
+			_progress += value;
 		}
 
 		[Bindable(event="busyChange")]
@@ -145,7 +156,7 @@ package fr.batchass
 		}
 		private function processConvert(event:Event): void 
 		{
-			dispatchEvent( new Event(Event.CHANGE) );
+			//TODO VERIFY if useless dispatchEvent( new Event(Event.CHANGE) );
 			status = "(" + countDone + "/" + countTotal + ")";
 			
 			var freeSpace:Number = Math.round( File.applicationStorageDirectory.spaceAvailable / 1048576 );
@@ -161,48 +172,45 @@ package fr.batchass
 					{
 						busy = true;
 						convert( fileToConvert[0] );
-						fileToConvert.shift();
+						//fileToConvert.shift();
 					}
 					else
-					{	
-						/*if ( newClips.length > 0 )
+					{													
+						// all is converted and finished
+						/*summary = "Completed:\n"; // [" + allFiles + "]\n";
+						var availSwfs:String = newFiles + chgFiles + nochgFiles;
+						var countAvail:int = countNew + countChanged + countNoChange;
+						summary += "- newly indexed: " + countNew + " clip(s)";
+						if ( countNew > 0 )	summary += " [" + newFiles + "]\n" else summary += "\n";
+						summary += "- changed: " + countChanged + " clip(s)";
+						if ( countChanged > 0 )	summary += " [" + chgFiles + "]\n" else summary += "\n";
+						summary += "- deleted: " + countDeleted + " clip(s)";
+						if ( countDeleted > 0 )	summary += " [" + delFiles + "]\n" else summary += "\n";
+						summary += "- no change: " + countNoChange + " clip(s)";
+						if ( countNoChange > 0 ) summary += " [" + nochgFiles + "]\n" else summary += "\n";
+						if ( countError > 0 )
 						{
-							var clips:Clips = Clips.getInstance();
-							clips.addNewClip( newClips[0].clipName, newClips[0].ownXml, newClips[0].cPath );
-							newClips.shift();
+							summary += "- could not convert thumbs and preview: " + countError + " clip(s) [" + errFiles + "]\n";
 						}
-						else
-						{	*/							
-							// all is converted and finished
-							summary = "Completed:\n"; // [" + allFiles + "]\n";
-							var availSwfs:String = newFiles + chgFiles + nochgFiles;
-							var countAvail:int = countNew + countChanged + countNoChange;
-							summary += "- newly indexed: " + countNew + " clip(s)";
-							if ( countNew > 0 )	summary += " [" + newFiles + "]\n" else summary += "\n";
-							summary += "- changed: " + countChanged + " clip(s)";
-							if ( countChanged > 0 )	summary += " [" + chgFiles + "]\n" else summary += "\n";
-							summary += "- deleted: " + countDeleted + " clip(s)";
-							if ( countDeleted > 0 )	summary += " [" + delFiles + "]\n" else summary += "\n";
-							summary += "- no change: " + countNoChange + " clip(s)";
-							if ( countNoChange > 0 ) summary += " [" + nochgFiles + "]\n" else summary += "\n";
-							if ( countError > 0 )
-							{
-								summary += "- could not convert thumbs and preview: " + countError + " clip(s) [" + errFiles + "]\n";
-							}
-							summary += "- available as swf: " + countAvail + " clip(s)";
-							if ( countAvail > 0 ) summary += " [" + availSwfs + "]\n" else summary += "\n";
+						summary += "- available as swf: " + countAvail + " clip(s)";
+						if ( countAvail > 0 ) summary += " [" + availSwfs + "]\n" else summary += "\n";
 
-							dispatchEvent( new Event(Event.COMPLETE) );							
-						//}
+						dispatchEvent( new Event(Event.COMPLETE) );*/													
 					}
 				}
 				else
 				{
 					//busy
-					if ( !startFFMpegProcess.running ) busy = false;
+					if ( !startFFMpegProcess.running ) 
+					{
+						busy = false;
+					}
+					else
+					{
+						trace("ruunnnning");
+					}
 				}
 				
-				//if ( ( fileToConvert.length == 0 ) && ( newClips.length == 0 ) )
 				if ( fileToConvert.length == 0 )
 				{
 					busy = false;
@@ -227,7 +235,6 @@ package fr.batchass
 			}
 			else
 			{
-				//log.text += "Clip already in db: " + clipGeneratedTitle + "\n";
 				// check if file changed
 				if ( clips.fileChanged( clip.clipRelativePath, FlexGlobals.topLevelApplication.ownFolderPath ) )
 				{
@@ -249,8 +256,6 @@ package fr.batchass
 					clips.deleteClip( clip.clipGeneratedName, clip.clipRelativePath );
 					// generate new files
 					fileToConvert.push( clip ); 
-					//TODO TO BE CHECKED if done twice
-					//clips.addNewClip( clip.clipGeneratedName, clipXml, clip.clipPath );
 					countChanged++;
 					countDone++;
 					chgFiles += clip.clipGeneratedTitle + " ";
@@ -263,8 +268,15 @@ package fr.batchass
 				}
 			}
 		}
-		private function onConvertComplete(clip:Clip):void
+		private function onThumbConvertComplete(clip:Clip):void
 		{
+			progress += "ThumbConvert Completed:" + clip.clipGeneratedName + "\n";
+			generate( clip, false );
+
+		}
+		private function onMovieConvertComplete(clip:Clip):void
+		{
+			progress += "MovieConvert Completed:" + clip.clipGeneratedName + "\n";
 			// create XML
 			OWN_CLIPS_XML = <video id={clip.clipGeneratedName} urllocal={clip.clipRelativePath} datemodified={clip.clipModificationDate} size={clip.clipSize}> 
 								<urlthumb1>{clip.thumbsPath + "thumb1.jpg"}</urlthumb1>
@@ -294,6 +306,33 @@ package fr.batchass
 			// we now create clip XML when thumb and swf are successfully generated
 			var clips:Clips = Clips.getInstance();
 			clips.addNewClip( clip.clipGeneratedName, OWN_CLIPS_XML, clip.clipPath );
+			if ( fileToConvert.length > 0 ) 
+			{
+				fileToConvert.shift();
+			}
+			else
+			{
+				// all is converted and finished
+				summary = "Completed:\n"; // [" + allFiles + "]\n";
+				var availSwfs:String = newFiles + chgFiles + nochgFiles;
+				var countAvail:int = countNew + countChanged + countNoChange;
+				summary += "- newly indexed: " + countNew + " clip(s)";
+				if ( countNew > 0 )	summary += " [" + newFiles + "]\n" else summary += "\n";
+				summary += "- changed: " + countChanged + " clip(s)";
+				if ( countChanged > 0 )	summary += " [" + chgFiles + "]\n" else summary += "\n";
+				summary += "- deleted: " + countDeleted + " clip(s)";
+				if ( countDeleted > 0 )	summary += " [" + delFiles + "]\n" else summary += "\n";
+				summary += "- no change: " + countNoChange + " clip(s)";
+				if ( countNoChange > 0 ) summary += " [" + nochgFiles + "]\n" else summary += "\n";
+				if ( countError > 0 )
+				{
+					summary += "- could not convert thumbs and preview: " + countError + " clip(s) [" + errFiles + "]\n";
+				}
+				summary += "- available as swf: " + countAvail + " clip(s)";
+				if ( countAvail > 0 ) summary += " [" + availSwfs + "]\n" else summary += "\n";
+				
+				dispatchEvent( new Event(Event.COMPLETE) );	
+			}
 		}
 		
 		
@@ -304,39 +343,34 @@ package fr.batchass
 			Util.ffMpegOutputLog( "NativeProcess processClose" );
 		}
 
-		//thumb or movie convert progress
-		private function errorOutputDataHandler(event:ProgressEvent):void
+		// thumb convert progress
+		private function errorThumbDataHandler(event:ProgressEvent):void
 		{
 			var process:NativeProcess = event.target as NativeProcess;
 			var data:String = process.standardError.readUTFBytes(process.standardError.bytesAvailable);
-			//resetConsole();
-			//configComp.log.text += data;
 			if (data.indexOf("muxing overhead")>-1) 
 			{
 				if ( fileToConvert.length > 0 )
 				{					
+					progress += "Thumb convertion completed: " + fileToConvert[0].name + "\n";
 					thumb1 = fileToConvert[0].thumbsPath + "thumb1.jpg";
 					if ( thumb1.length > 0 )
 					{
 						var sourceFile:File = new File( thumb1 );
 						if( sourceFile.exists )
 						{
-							// it's a thumb (TODO verify)
 							//file: copy
 							copyFile( thumb1, fileToConvert[0].thumbsPath + "thumb2.jpg" );
 							copyFile( thumb1, fileToConvert[0].thumbsPath + "thumb3.jpg" );
 						}
-						else
-						{
-							//it's a swf movie (TODO verify)
-							onConvertComplete(fileToConvert[0]);
-						}
 					}
+					onThumbConvertComplete(fileToConvert[0]);
 				}
 				busy = false;
 			}
 			if (data.indexOf("swf: I/O error occurred")>-1)
 			{ 
+				if ( fileToConvert.length > 0 ) progress += "Thumb convertion: I/O error occurred: " + fileToConvert[0].name + "\n";
 				busy = false;
 				// TODO verify
 				countError++;
@@ -345,12 +379,43 @@ package fr.batchass
 			}
 			if (data.indexOf("Unknown format")>-1)
 			{ 
+				if ( fileToConvert.length > 0 ) progress += "Thumb convertion: Unknown format: " + fileToConvert[0].name + "\n";
 				busy = false;
 				// TODO verify
 				countError++;
 				errFiles += currentFilename + " ";
 			}
-			Util.ffMpegErrorLog( "NativeProcess errorOutputDataHandler: " + data );
+			Util.ffMpegErrorLog( "NativeProcess errorThumbDataHandler: " + data );
+		}
+		// movie convert progress
+		private function errorMovieDataHandler(event:ProgressEvent):void
+		{
+			var process:NativeProcess = event.target as NativeProcess;
+			var data:String = process.standardError.readUTFBytes(process.standardError.bytesAvailable);
+			if (data.indexOf("muxing overhead")>-1) 
+			{
+				if ( fileToConvert.length > 0 )
+				{					
+					progress += "Movie convertion completed: " + fileToConvert[0].name + "\n";
+					onMovieConvertComplete(fileToConvert[0]);
+				}
+				busy = false;
+			}
+			if (data.indexOf("swf: I/O error occurred")>-1)
+			{ 
+				if ( fileToConvert.length > 0 ) progress += "Movie convertion swf: I/O error occurred: " + fileToConvert[0].name + "\n";
+				busy = false;
+				countError++;
+				errFiles += currentFilename + " ";
+			}
+			if (data.indexOf("Unknown format")>-1)
+			{ 
+				if ( fileToConvert.length > 0 ) progress += "Movie convertion: Unknown format: " + fileToConvert[0].name + "\n";
+				busy = false;
+				countError++;
+				errFiles += currentFilename + " ";
+			}
+			Util.ffMpegErrorLog( "NativeProcess errorMovieDataHandler: " + data );
 		}
 		public function start():void
 		{
@@ -368,7 +433,7 @@ package fr.batchass
 			errFiles = "";
 			allFiles = "";
 			currentFilename = "";
-
+			timer.start();
 		}
 		public function copyFile( src:String, dest:String ):void
 		{
@@ -383,6 +448,7 @@ package fr.batchass
 			catch (error:Error)
 			{
 				Util.errorLog( "copyFile Error:" + error.message );
+				progress += "copyFile Error:" + error.message + "\n";
 			}			
 		}
 		
@@ -390,7 +456,7 @@ package fr.batchass
 		private function convert( clip:Clip ):void
 		{
 			generate( clip, true );
-			generate( clip, false );
+			//generate( clip, false );
 		}
 		private function generate( clip:Clip, thumb:Boolean ):void
 		{
@@ -473,10 +539,15 @@ package fr.batchass
 					
 					startFFMpegProcess = new NativeProcess();
 					startFFMpegProcess.start(nativeProcessStartupInfo);
-					startFFMpegProcess.addEventListener(ProgressEvent.STANDARD_OUTPUT_DATA,
-						outputDataHandler);
-					startFFMpegProcess.addEventListener(ProgressEvent.STANDARD_ERROR_DATA,
-						errorOutputDataHandler);
+					startFFMpegProcess.addEventListener(ProgressEvent.STANDARD_OUTPUT_DATA,	outputDataHandler);
+					if ( thumb ) 
+					{
+						startFFMpegProcess.addEventListener(ProgressEvent.STANDARD_ERROR_DATA, errorThumbDataHandler);
+					}
+					else
+					{
+						startFFMpegProcess.addEventListener(ProgressEvent.STANDARD_ERROR_DATA, errorMovieDataHandler);						
+					}
 					startFFMpegProcess.addEventListener(Event.STANDARD_OUTPUT_CLOSE, processClose );
 					startFFMpegProcess.addEventListener(NativeProcessExitEvent.EXIT, onExit);				
 				}

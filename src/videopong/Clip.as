@@ -18,6 +18,7 @@ package videopong
 		private var _clipGeneratedTitleWithoutExtension:String;
 		private var _thumbsPath:String;
 		private var _swfPath:String;
+		//private var _isThumb:Boolean;
 		public function Clip( lstFile:File )
 		{
 			name = lstFile.name;
