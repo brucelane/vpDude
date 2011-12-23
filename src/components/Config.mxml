@@ -56,7 +56,7 @@
 					<s:Label width="{lblWidth}" text="{countNoChange}" verticalAlign="bottom"/>
 					<s:Label width="{lblWidth}" text="{countError}" verticalAlign="bottom"/>
 				</s:VGroup>
-				<s:TextArea id="log" text="{progress}{summary}" width="600" height="350" change="log_changeHandler(event)" />
+				<s:TextArea id="log" text="{progress}{summary}" width="610" height="350" change="log_changeHandler(event)" />
 				<!--<s:TextArea id="ffout" text="" width="500" height="250"/>-->
 				</s:HGroup>
 			<!--<s:Button label="Clear console text" click="log.text=''" />-->

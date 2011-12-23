@@ -285,15 +285,13 @@ protected function exploreBtn_clickHandler(event:MouseEvent):void
 		//file.browse();
 	}
 }
-private function resetConsole():void
-{
-	if ( log.text.length > 500 ) log.text = "";
-}	
 
 private function resyncComplete(event:Event):void
 {
 	cnv.removeEventListener( Event.COMPLETE, resyncComplete );
 	setCurrentState("Normal");
+	log.text = "";
+	progress = "";
 	summary = cnv.summary;
 }
 private function statusChange(event:Event):void
@@ -415,6 +413,7 @@ private function deleteFolder( path:String ): void
 
 protected function log_changeHandler(event:TextOperationEvent):void
 {
+	if ( log.text.length > 500 ) log.text = "";
 	log.validateNow();
 	log.scroller.verticalScrollBar.value = log.scroller.verticalScrollBar.maximum;
 }

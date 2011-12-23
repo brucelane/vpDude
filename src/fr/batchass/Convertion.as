@@ -70,7 +70,7 @@ package fr.batchass
 		private function processConvert(event:Event): void 
 		{
 			//dispatchEvent( new Event(Event.CHANGE) );
-			status = "(" + countDone + "/" + countTotal + ")";
+			status = countDone + "/" + countTotal;
 			//Util.convertLog( "processConvert, status:" + status );
 			
 			var freeSpace:Number = Math.round( File.applicationStorageDirectory.spaceAvailable / 1048576 );
@@ -217,6 +217,7 @@ package fr.batchass
 			if ( fileToConvert.length == 0 ) 
 			{
 				// all is converted and finished
+				progress = "";
 				summary = "Completed:\n"; // [" + allFiles + "]\n";
 				var availSwfs:String = newFiles + chgFiles + nochgFiles;
 				var countAvail:int = countNew + countChanged + countNoChange;
@@ -255,7 +256,7 @@ package fr.batchass
 			{
 				if ( fileToConvert.length > 0 )
 				{					
-					progress = "Thumb convertion completed: " + fileToConvert[0].name + "\n";
+					//progress = "Thumb convertion completed: " + fileToConvert[0].name + "\n";
 					thumb1 = fileToConvert[0].thumbsPath + "thumb1.jpg";
 					if ( thumb1.length > 0 )
 					{
@@ -299,7 +300,7 @@ package fr.batchass
 			{
 				if ( fileToConvert.length > 0 )
 				{					
-					progress = "Movie convertion completed: " + fileToConvert[0].name + "\n";
+					//progress = "Movie convertion completed: " + fileToConvert[0].name + "\n";
 					onMovieConvertComplete(fileToConvert[0]);
 				}
 				busy = false;
@@ -349,6 +350,8 @@ package fr.batchass
 			allFiles = "";
 			currentFilename = "";
 			status = "";
+			summary = "";
+			progress = "";
 			timer.start();
 		}
 		public function copyFile( src:String, dest:String ):void
