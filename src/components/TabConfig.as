@@ -50,6 +50,8 @@ private var countError:String = "";
 [Bindable]
 private var summary:String = "";
 [Bindable]
+private var progress:String = "";
+[Bindable]
 private var frame:String = "";
 
 private var password:String = "";
@@ -307,6 +309,10 @@ private function frameChange(event:Event):void
 {
 	frame = cnv.frame + " frames converted";
 }
+private function progressChange(event:Event):void
+{
+	progress = cnv.progress;
+}
 
 protected function resyncBtn_clickHandler(event:MouseEvent):void
 {
@@ -316,9 +322,10 @@ protected function resyncBtn_clickHandler(event:MouseEvent):void
 	cnv.addEventListener( Event.COMPLETE, resyncComplete );
 	cnv.addEventListener( Event.CHANGE, statusChange );
 	cnv.addEventListener( Event.ADDED, frameChange );
+	cnv.addEventListener( Event.CONNECT, progressChange );
 	log.text = "";
-	ffout.text = "";
 	summary = "";
+	progress = "";
 	if ( parentDocument.ownFolderPath != ownTextInput.text ) 
 	{
 		parentDocument.ownFolderPath = ownTextInput.text;

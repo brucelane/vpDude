@@ -22,14 +22,12 @@ package fr.batchass
 		private static var instance:Convertion;
 		private var timer:Timer;
 		public var fileToConvert:Array = new Array();
-		//public var newClips:Array = new Array();
 		private var startFFMpegProcess:NativeProcess;
 		[Bindable]		
 		public var currentFilename:String = "";
 		private var currentThumb:int;
 		private var thumb1:String;
 		private var _status:String = "";
-		//public var tPath:String;
 
 		private var _busy:Boolean = false;
 		private var _summary:String = "";
@@ -89,6 +87,10 @@ package fr.batchass
 						busy = true;
 						Util.convertLog( "processConvert, fileToConvert.length:" + fileToConvert.length );
 						convert( fileToConvert[0] );
+					}
+					else
+					{
+						dispatchEvent( new Event(Event.COMPLETE) );	
 					}
 				}
 				else
@@ -168,6 +170,7 @@ package fr.batchass
 			progress = "Thumb convertion completed:" + clip.clipGeneratedName + "\n";
 			Util.convertLog( "onThumbConvertComplete, ThumbConvert Completed:" + clip.clipGeneratedTitle );
 			Util.convertLog( "onThumbConvertComplete, fileToConvert.length:" + fileToConvert.length );
+			frame = 0;
 			generate( clip, false );
 		}
 		private function onMovieConvertComplete(clip:Clip):void
@@ -303,13 +306,13 @@ package fr.batchass
 			}
 			if (data.indexOf("frame")>-1) 
 			{
-				var start:int = data.indexOf("frame") + 5;
+				var start:int = data.indexOf("frame") + 6;
 				var end:int = data.indexOf("fps");
 			
 				if ( end>-1 ) 
 				{	
-					var frameStr:String = data.substr( start, end );
-					frame = frameStr as int;
+					var frameStr:String = data.substring( start, end );
+					frame = int(frameStr);
 					dispatchEvent( new Event(Event.ADDED) );	
 				}
 			}
@@ -521,6 +524,7 @@ package fr.batchass
 		public function set progress(value:String):void
 		{
 			_progress += value;
+			dispatchEvent( new Event(Event.CONNECT) );	
 		}
 		
 		[Bindable(event="busyChange")]
