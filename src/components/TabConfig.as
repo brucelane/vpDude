@@ -321,6 +321,7 @@ private function progressChange(event:Event):void
 
 protected function resyncBtn_clickHandler(event:MouseEvent):void
 {
+	resyncBtn.enabled = false;
 	setCurrentState("Busy");
 	//showProgress = true;
 	cnv = Convertion.getInstance(); 
