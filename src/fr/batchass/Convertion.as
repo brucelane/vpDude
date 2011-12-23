@@ -170,7 +170,7 @@ package fr.batchass
 		}
 		private function onThumbConvertComplete(clip:Clip):void
 		{
-			progress = "Thumb convertion completed:" + clip.clipGeneratedName + "\n";
+			progress += "Thumb convertion completed:" + clip.clipGeneratedName + "\n";
 			Util.convertLog( "onThumbConvertComplete, ThumbConvert Completed:" + clip.clipGeneratedTitle );
 			Util.convertLog( "onThumbConvertComplete, fileToConvert.length:" + fileToConvert.length );
 			frame = 0;
@@ -178,7 +178,7 @@ package fr.batchass
 		}
 		private function onMovieConvertComplete(clip:Clip):void
 		{
-			progress = "Movie convertion completed:" + clip.clipGeneratedName + "\n";
+			progress += "Movie convertion completed:" + clip.clipGeneratedName + "\n";
 			Util.convertLog( "onMovieConvertComplete, MovieConvert Completed:" + clip.clipGeneratedTitle );
 			Util.convertLog( "onMovieConvertComplete, fileToConvert.length:" + fileToConvert.length );
 			// create XML
@@ -231,7 +231,7 @@ package fr.batchass
 			summary = "Completed:\n"; // [" + allFiles + "]\n";
 			var availSwfs:String = newFiles + chgFiles + nochgFiles;
 			var countAvail:int = countNew + countChanged + countNoChange;
-			summary += "- newly indexed: " + countNew + " clip(s)";
+			summary += "- new: " + countNew + " clip(s)";
 			if ( countNew > 0 )	summary += " [" + newFiles + "]\n" else summary += "\n";
 			summary += "- changed: " + countChanged + " clip(s)";
 			if ( countChanged > 0 )	summary += " [" + chgFiles + "]\n" else summary += "\n";
@@ -282,12 +282,12 @@ package fr.batchass
 			}
 			if (data.indexOf("swf: I/O error occurred")>-1)
 			{ 
-				if ( fileToConvert.length > 0 ) progress = "Thumb convertion: I/O error occurred: " + fileToConvert[0].name + "\n";
+				if ( fileToConvert.length > 0 ) progress += "Thumb convertion: I/O error occurred: " + fileToConvert[0].name + "\n";
 				manageConvertError();
 			}
 			if (data.indexOf("Unknown format")>-1)
 			{ 
-				if ( fileToConvert.length > 0 ) progress = "Thumb convertion: Unknown format: " + fileToConvert[0].name + "\n";
+				if ( fileToConvert.length > 0 ) progress += "Thumb convertion: Unknown format: " + fileToConvert[0].name + "\n";
 				manageConvertError();
 			}
 			Util.ffMpegOutputLog( "NativeProcess errorThumbDataHandler: " + data );
@@ -327,18 +327,19 @@ package fr.batchass
 			}
 			if (data.indexOf("swf: I/O error occurred")>-1)
 			{ 
-				if ( fileToConvert.length > 0 ) progress = "Movie convertion swf: I/O error occurred: " + fileToConvert[0].name + "\n";
+				if ( fileToConvert.length > 0 ) progress += "Movie convertion swf: I/O error occurred: " + fileToConvert[0].name + "\n";
 				manageConvertError();
 			}
 			if (data.indexOf("Unknown format")>-1)
 			{ 
-				if ( fileToConvert.length > 0 ) progress = "Movie convertion: Unknown format: " + fileToConvert[0].name + "\n";
+				if ( fileToConvert.length > 0 ) progress += "Movie convertion: Unknown format: " + fileToConvert[0].name + "\n";
 				manageConvertError();
 			}
 			Util.ffMpegOutputLog( "NativeProcess errorMovieDataHandler: " + data );
 		}
 		public function start():void
 		{
+			frame = 0;
 			countNew = 0;
 			countDeleted = 0;
 			countChanged = 0;
@@ -356,6 +357,7 @@ package fr.batchass
 			status = "";
 			summary = "";
 			progress = "";
+			_progress = "";
 			timer.start();
 		}
 		public function copyFile( src:String, dest:String ):void
@@ -464,13 +466,13 @@ package fr.batchass
 					startFFMpegProcess.addEventListener(ProgressEvent.STANDARD_OUTPUT_DATA,	outputDataHandler);
 					if ( thumb ) 
 					{
-						progress = "Thumb convertion started:" + clip.clipGeneratedName + "\n";
+						progress += "Thumb convertion started:" + clip.clipGeneratedName + "\n";
 						Util.convertLog( "Thumb convertion started:" + clip.clipGeneratedName );
 						startFFMpegProcess.addEventListener(ProgressEvent.STANDARD_ERROR_DATA, errorThumbDataHandler);
 					}
 					else
 					{
-						progress = "Movie convertion started:" + clip.clipGeneratedName + "\n";
+						progress += "Movie convertion started:" + clip.clipGeneratedName + "\n";
 						Util.convertLog( "Movie convertion started:" + clip.clipGeneratedName );
 						startFFMpegProcess.addEventListener(ProgressEvent.STANDARD_ERROR_DATA, errorMovieDataHandler);						
 					}
@@ -570,7 +572,6 @@ package fr.batchass
 			{
 				instance = new Convertion();
 			}
-			
 			return instance;
 		}
 		
