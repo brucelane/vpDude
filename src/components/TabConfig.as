@@ -47,6 +47,10 @@ private var countDeleted:String = "";
 private var countNoChange:String = "";
 [Bindable]
 private var countError:String = "";
+[Bindable]
+private var summary:String = "";
+[Bindable]
+private var frame:String = "";
 
 private var password:String = "";
 private var passwordChanged:Boolean = false;
@@ -279,23 +283,16 @@ protected function exploreBtn_clickHandler(event:MouseEvent):void
 		//file.browse();
 	}
 }
-
-private function busyChange(event:Event):void
+private function resetConsole():void
 {
-	Util.convertLog( "busyChange:" + cnv.busy );
-	if ( cnv.busy )
-	{
-		setCurrentState("Busy");	
-	}
-	else
-	{
-		setCurrentState("Normal");
-	}				
-	
-}
+	if ( log.text.length > 500 ) log.text = "";
+}	
+
 private function resyncComplete(event:Event):void
 {
 	cnv.removeEventListener( Event.COMPLETE, resyncComplete );
+	setCurrentState("Normal");
+	summary = cnv.summary;
 }
 private function statusChange(event:Event):void
 {
@@ -306,20 +303,22 @@ private function statusChange(event:Event):void
 	countNoChange = cnv.countNoChange + " has no change";
 	countError = cnv.countError + " error(s)";
 }
-private function resetConsole():void
+private function frameChange(event:Event):void
 {
-	if ( log.text.length > 500 ) log.text = "";
-}	
+	frame = cnv.frame + " frames converted";
+}
 
 protected function resyncBtn_clickHandler(event:MouseEvent):void
 {
+	setCurrentState("Busy");
 	showProgress = true;
 	cnv = Convertion.getInstance(); 
-	cnv.addEventListener( Event.ADDED, resyncComplete );
-	cnv.addEventListener( Event.COMPLETE, busyChange );
+	cnv.addEventListener( Event.COMPLETE, resyncComplete );
 	cnv.addEventListener( Event.CHANGE, statusChange );
+	cnv.addEventListener( Event.ADDED, frameChange );
 	log.text = "";
 	ffout.text = "";
+	summary = "";
 	if ( parentDocument.ownFolderPath != ownTextInput.text ) 
 	{
 		parentDocument.ownFolderPath = ownTextInput.text;

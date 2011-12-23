@@ -32,8 +32,8 @@ package fr.batchass
 		//public var tPath:String;
 
 		private var _busy:Boolean = false;
-		private var _summary:String;
-		private var _progress:String;
+		private var _summary:String = "";
+		private var _progress:String = "";
 		
 		[Bindable]
 		public var countNew:int = 0;
@@ -47,6 +47,8 @@ package fr.batchass
 		public var countError:int = 0;
 		[Bindable]
 		public var countTotal:int = 0;
+		[Bindable]
+		public var frame:int = 0;
 		[Bindable]
 		public var countNoChange:int = 0;
 		public var nochgFiles:String = "";
@@ -62,16 +64,14 @@ package fr.batchass
 		public function Convertion()
 		{
 			Util.log( "Conversion, constructor" );
-			//status = "(0/0)";
 			dispatcher = new EventDispatcher(this);
 			timer = new Timer(1000);
 			timer.addEventListener(TimerEvent.TIMER, processConvert);
-			//timer.start();
 		}
 
 		private function processConvert(event:Event): void 
 		{
-			dispatchEvent( new Event(Event.CHANGE) );
+			//dispatchEvent( new Event(Event.CHANGE) );
 			status = "(" + countDone + "/" + countTotal + ")";
 			//Util.convertLog( "processConvert, status:" + status );
 			
@@ -103,7 +103,6 @@ package fr.batchass
 				
 				if ( fileToConvert.length == 0 )
 				{
-					Util.convertLog( "processConvert, fileToConvert.length == 0, busy becomes false" );
 					busy = false;
 				}				
 				
@@ -166,14 +165,14 @@ package fr.batchass
 		}
 		private function onThumbConvertComplete(clip:Clip):void
 		{
-			progress = "ThumbConvert Completed:" + clip.clipGeneratedName + "\n";
+			progress = "Thumb convertion completed:" + clip.clipGeneratedName + "\n";
 			Util.convertLog( "onThumbConvertComplete, ThumbConvert Completed:" + clip.clipGeneratedTitle );
 			Util.convertLog( "onThumbConvertComplete, fileToConvert.length:" + fileToConvert.length );
 			generate( clip, false );
 		}
 		private function onMovieConvertComplete(clip:Clip):void
 		{
-			progress = "MovieConvert Completed:" + clip.clipGeneratedName + "\n";
+			progress = "Movie convertion completed:" + clip.clipGeneratedName + "\n";
 			Util.convertLog( "onMovieConvertComplete, MovieConvert Completed:" + clip.clipGeneratedTitle );
 			Util.convertLog( "onMovieConvertComplete, fileToConvert.length:" + fileToConvert.length );
 			// create XML
@@ -212,7 +211,7 @@ package fr.batchass
 				Util.convertLog( "onMovieConvertComplete, fileToConvert.shift" );
 				Util.convertLog( "onMovieConvertComplete, fileToConvert.length:" + fileToConvert.length );
 			}
-			else
+			if ( fileToConvert.length == 0 ) 
 			{
 				// all is converted and finished
 				summary = "Completed:\n"; // [" + allFiles + "]\n";
@@ -302,6 +301,18 @@ package fr.batchass
 				}
 				busy = false;
 			}
+			if (data.indexOf("frame")>-1) 
+			{
+				var start:int = data.indexOf("frame") + 5;
+				var end:int = data.indexOf("fps");
+			
+				if ( end>-1 ) 
+				{	
+					var frameStr:String = data.substr( start, end );
+					frame = frameStr as int;
+					dispatchEvent( new Event(Event.ADDED) );	
+				}
+			}
 			if (data.indexOf("swf: I/O error occurred")>-1)
 			{ 
 				if ( fileToConvert.length > 0 ) progress = "Movie convertion swf: I/O error occurred: " + fileToConvert[0].name + "\n";
@@ -351,7 +362,6 @@ package fr.batchass
 			catch (error:Error)
 			{
 				Util.errorLog( "copyFile Error:" + error.message );
-				progress = "copyFile Error:" + error.message + "\n";
 			}			
 		}
 		
@@ -444,10 +454,14 @@ package fr.batchass
 					startFFMpegProcess.addEventListener(ProgressEvent.STANDARD_OUTPUT_DATA,	outputDataHandler);
 					if ( thumb ) 
 					{
+						progress = "Thumb convertion started:" + clip.clipGeneratedName + "\n";
+						Util.convertLog( "Thumb convertion started:" + clip.clipGeneratedName );
 						startFFMpegProcess.addEventListener(ProgressEvent.STANDARD_ERROR_DATA, errorThumbDataHandler);
 					}
 					else
 					{
+						progress = "Movie convertion started:" + clip.clipGeneratedName + "\n";
+						Util.convertLog( "Movie convertion started:" + clip.clipGeneratedName );
 						startFFMpegProcess.addEventListener(ProgressEvent.STANDARD_ERROR_DATA, errorMovieDataHandler);						
 					}
 					startFFMpegProcess.addEventListener(Event.STANDARD_OUTPUT_CLOSE, processClose );

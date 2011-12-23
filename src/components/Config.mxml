@@ -50,6 +50,7 @@
 				<s:TextArea id="log" text="{cnv.progress}"  width="100%" height="100" change="log_changeHandler(event)" />
 				<s:HGroup>
 					<s:VGroup visible="{showProgress}">						
+						<s:Label width="{lblWidth}" text="{frame}" verticalAlign="bottom"/>
 						<s:Label width="{lblWidth}" text="{status}" verticalAlign="bottom"/>
 						<s:Label width="{lblWidth}" text="{countNew}" verticalAlign="bottom"/>
 						<s:Label width="{lblWidth}" text="{countChanged}" verticalAlign="bottom"/>
@@ -57,7 +58,7 @@
 						<s:Label width="{lblWidth}" text="{countNoChange}" verticalAlign="bottom"/>
 						<s:Label width="{lblWidth}" text="{countError}" verticalAlign="bottom"/>
 					</s:VGroup>
-					<s:TextArea id="ffout" text="{cnv.summary}" width="500" height="250"/>
+					<s:TextArea id="ffout" text="{summary}" width="500" height="250"/>
 					</s:HGroup>
 				<s:Button label="Clear console text" click="log.text=''" />
 			</s:VGroup>			
