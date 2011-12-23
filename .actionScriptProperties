@@ -27,17 +27,14 @@
   <flashCatalyst validateFlashCatalystCompatibility="false"/>
   <buildTargets>
     <buildTarget buildTargetName="default">
-      <airSettings airCertificatePath="/Users/sit/Documents/Adobe Flash Builder 4.5/cert/255426024.p12" airTimestamp="true" version="1">
+      <airSettings airCertificatePath="D:/projects/Workspace/vpDude/certificate/vpDude.p12" airTimestamp="true" anePathSet="true" version="1">
         <airExcludes>
-          <pathEntry path="ffmpeg/ffmpeg.exe"/>
-          <pathEntry path="ffmpeg/.DS_Store"/>
+          <pathEntry path="ffmpeg/ffmpeg.dat"/>
           <pathEntry path="ffmpeg/ffmpeg.lame"/>
-          <pathEntry path="css"/>
-          <pathEntry path=".DS_Store"/>
         </airExcludes>
+        <anePaths/>
       </airSettings>
       <actionScriptSettings version="1"/>
     </buildTarget>
   </buildTargets>
 </actionScriptProperties>
-

@@ -302,6 +302,7 @@ private function resyncComplete(event:Event):void
 }
 private function statusChange(event:Event):void
 {
+	summary = cnv.summary;
 	status = cnv.status + " clips converted";
 	countNew = cnv.countNew + " new";
 	countChanged = cnv.countChanged + " changed";
@@ -329,6 +330,7 @@ protected function resyncBtn_clickHandler(event:MouseEvent):void
 	cnv.addEventListener( Event.CONNECT, progressChange );
 	log.text = "";
 	summary = "";
+	cnv.progress = "";
 	progress = "";
 	if ( parentDocument.ownFolderPath != ownTextInput.text ) 
 	{
