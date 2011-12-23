@@ -33,8 +33,8 @@ public var userName:String = "";
 private var hiddenPassword:String = "";
 [Bindable]
 private var vpDbPath:String = "";
-[Bindable]
-private var showProgress:Boolean = false;
+/*[Bindable]
+private var showProgress:Boolean = false;*/
 [Bindable]
 private var status:String = "";
 [Bindable]
@@ -138,6 +138,11 @@ protected function config_creationCompleteHandler(event:FlexEvent):void
 		vpDbPath = parentDocument.vpFolderPath;
 	}
 	cnv = Convertion.getInstance();
+	cnv.addEventListener( Event.COMPLETE, resyncComplete );
+	cnv.addEventListener( Event.CHANGE, statusChange );
+	cnv.addEventListener( Event.ADDED, frameChange );
+	cnv.addEventListener( Event.CONNECT, progressChange );
+
 }
 protected function pwdTextInput_focusInHandler(event:FocusEvent):void
 {
@@ -291,6 +296,7 @@ private function resyncComplete(event:Event):void
 	cnv.removeEventListener( Event.COMPLETE, resyncComplete );
 	setCurrentState("Normal");
 	log.text = "";
+	cnv.progress = "";
 	progress = "";
 	summary = cnv.summary;
 }
@@ -315,7 +321,7 @@ private function progressChange(event:Event):void
 protected function resyncBtn_clickHandler(event:MouseEvent):void
 {
 	setCurrentState("Busy");
-	showProgress = true;
+	//showProgress = true;
 	cnv = Convertion.getInstance(); 
 	cnv.addEventListener( Event.COMPLETE, resyncComplete );
 	cnv.addEventListener( Event.CHANGE, statusChange );

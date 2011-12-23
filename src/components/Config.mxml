@@ -47,7 +47,7 @@
 				<s:Button label="Sync my own folder" label.Busy="Sync in progress.." enabled.Busy="false" width="200" toolTip="resync my own files" id="resyncBtn" click="resyncBtn_clickHandler(event)"/>
 			</s:HGroup>	
 			<s:HGroup>
-				<s:VGroup visible="{showProgress}">						
+				<s:VGroup >	<!--visible="{showProgress}"-->					
 					<s:Label width="{lblWidth}" text="{frame}" verticalAlign="bottom"/>
 					<s:Label width="{lblWidth}" text="{status}" verticalAlign="bottom"/>
 					<s:Label width="{lblWidth}" text="{countNew}" verticalAlign="bottom"/>
@@ -56,7 +56,7 @@
 					<s:Label width="{lblWidth}" text="{countNoChange}" verticalAlign="bottom"/>
 					<s:Label width="{lblWidth}" text="{countError}" verticalAlign="bottom"/>
 				</s:VGroup>
-				<s:TextArea id="log" text="{progress}{summary}" width="610" height="350" change="log_changeHandler(event)" />
+				<s:TextArea id="log" text="{progress}{summary}" width="615" height="350" change="log_changeHandler(event)" />
 				<!--<s:TextArea id="ffout" text="" width="500" height="250"/>-->
 				</s:HGroup>
 			<!--<s:Button label="Clear console text" click="log.text=''" />-->
