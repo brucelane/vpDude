@@ -85,10 +85,11 @@ package fr.batchass
 						Util.convertLog( "processConvert, fileToConvert.length:" + fileToConvert.length );
 						convert( fileToConvert[0] );
 					}
+					/* called the resync 2 times
 					else
 					{
 						dispatchEvent( new Event(Event.COMPLETE) );	
-					}
+					}*/
 				}
 				else
 				{

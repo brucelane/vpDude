@@ -105,7 +105,18 @@ package videopong
 			}
 			
 		}
-
+		public function deleteTag(tagName:String ):void
+		{	
+			trace(tagName);
+			trace("TAGS_XML..tag.(@name==tagName):"+TAGS_XML..tag.(@name==tagName) );
+			trace("TAGS_XML..tag.(@name==tagName).length():"+TAGS_XML..tag.(@name==tagName).length() );
+			if ( TAGS_XML..tag.(@name==tagName).length() > 0 )
+			{
+				delete TAGS_XML..tag.(@name==tagName)[0];
+				//delete TAGS_XML..tag.(@name==tagName);
+				writeTagsFile();
+			}	
+		}
 		public function get dbPath():String
 		{
 			return _dbPath;

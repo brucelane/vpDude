@@ -293,8 +293,11 @@ protected function exploreBtn_clickHandler(event:MouseEvent):void
 
 private function resyncComplete(event:Event):void
 {
+	//TODO this is called 2 times
 	cnv.removeEventListener( Event.COMPLETE, resyncComplete );
-	setCurrentState("Normal");
+	//setCurrentState("Normal");
+	resyncBtn.enabled = true;
+	resyncBtn.label="Sync my own folder";
 	log.text = "";
 	cnv.progress = "";
 	progress = "";
@@ -319,11 +322,9 @@ private function progressChange(event:Event):void
 	progress = cnv.progress;
 }
 
-protected function resyncBtn_clickHandler(event:MouseEvent):void
+protected function browseAndConvert():void
 {
-	resyncBtn.enabled = false;
-	setCurrentState("Busy");
-	//showProgress = true;
+	Util.errorLog("browseAndConvert start");
 	cnv = Convertion.getInstance(); 
 	cnv.addEventListener( Event.COMPLETE, resyncComplete );
 	cnv.addEventListener( Event.CHANGE, statusChange );
@@ -337,6 +338,7 @@ protected function resyncBtn_clickHandler(event:MouseEvent):void
 	{
 		parentDocument.ownFolderPath = ownTextInput.text;
 	}
+	Util.errorLog("calling cnv.start");
 	cnv.start();
 	
 	var selectedDirectory:File = new File( parentDocument.ownFolderPath );
@@ -344,7 +346,6 @@ protected function resyncBtn_clickHandler(event:MouseEvent):void
 	ownFiles = new ArrayCollection( selectedDirectory.getDirectoryListing() );
 	
 	parentDocument.statusText.text = "Found " + ownFiles.length + " file(s)";
-	//syncStatus.text = "";
 	// delete inexistent files from db
 	var clips:Clips = Clips.getInstance();
 	var clipList:XMLList = clips.CLIPS_XML..video as XMLList;
@@ -361,9 +362,17 @@ protected function resyncBtn_clickHandler(event:MouseEvent):void
 				cnv.deleteFile( parentDocument.dbFolderPath + File.separator + clip.@id + ".xml" );
 				// delete in clips.xml
 				clips.deleteClip( clip.@id, clip.@urllocal );
-				//TODO delete tag in tags.xml
-				//var tags:Tags = Tags.getInstance();
-				//tags.
+				var clipId:String = clip.@id;
+				//delete tag in tags.xml
+				var clipTagList:XMLList = clip..tag as XMLList;
+				var tags:Tags = Tags.getInstance();
+				for each ( var clipTag:XML in clipTagList )
+				{
+					if ( clipId.indexOf( clipTag.@name ) > -1 )
+					{
+						tags.deleteTag( clipTag.@name );												
+					}
+				}				
 				// delete thumbs
 				cnv.deleteFile( clip.urlthumb1 );
 				cnv.deleteFile( clip.urlthumb2 );
@@ -379,10 +388,24 @@ protected function resyncBtn_clickHandler(event:MouseEvent):void
 			}		
 		}	 	
 	}
-
 	// read all files in the folder
 	processAllFiles( selectedDirectory );
-	
+}
+protected function resyncBtn_clickHandler(event:MouseEvent):void
+{
+	Util.errorLog("resyncBtn clicked");
+	/*setCurrentState("Busy");
+	Util.errorLog("resyncBtn set to busy state");*/
+	resyncBtn.enabled = false;
+	resyncBtn.label="Sync in progress..";
+
+	resyncBtn.invalidateDisplayList();
+	Util.errorLog("resyncBtn invalidateDisplayList");
+	resyncBtn.validateNow();
+	Util.errorLog("resyncBtn validateNow");
+	Util.errorLog("resyncBtn.label:" + resyncBtn.label);
+	this.callLater( browseAndConvert );
+
 }
 // Process all files in a directory structure including subdirectories.
 public function processAllFiles( selectedDir:File ):void

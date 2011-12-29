@@ -44,7 +44,7 @@
 			</s:HGroup>
 			<s:HGroup>
 				<s:Spacer width="{lblWidth}" />
-				<s:Button label="Sync my own folder" label.Busy="Sync in progress.." enabled.Busy="false" width="200" toolTip="resync my own files" id="resyncBtn" click="resyncBtn_clickHandler(event)"/>
+				<s:Button label="Sync my own folder" label.Busy="Sync in progress.." enabled.Busy="false" width="200" toolTip="resync my own files" id="resyncBtn" click="resyncBtn.enabled = false;resyncBtn.label='Sync in progress..';resyncBtn_clickHandler(event)"/>
 			</s:HGroup>	
 			<s:HGroup>
 				<s:VGroup >	<!--visible="{showProgress}"-->					
