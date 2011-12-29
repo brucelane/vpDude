@@ -1,6 +1,6 @@
 # Compiled source #
 ###################
-bin_debug/
+bin-debug/
 bin-release/
 libs/
 *.com
