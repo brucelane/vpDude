@@ -29,7 +29,6 @@ private function timerFct(event:Event):void
 }
 private function handleButtonClick():void
 {
-	
 	autoComplete.dataProvider = tags.tagsXMLList;
     if (autoComplete.isDropDownVisible())
     {
@@ -59,7 +58,7 @@ protected function search_creationCompleteHandler(event:FlexEvent):void
 }
 private function handleTagButtonClick():void
 {	
-	//TODO tagAutoComplete.dataProvider = tags.tagsXMLList;
+	tagAutoComplete.dataProvider = tags.tagsXMLList;
 	if ( tagAutoComplete.isDropDownVisible() )
 	{
 		tagAutoComplete.hideDropDown();

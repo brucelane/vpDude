@@ -105,17 +105,22 @@ package videopong
 			}
 			
 		}
-		public function deleteTag(tagName:String ):void
+		public function resyncTags():void
 		{	
-			trace(tagName);
-			trace("TAGS_XML..tag.(@name==tagName):"+TAGS_XML..tag.(@name==tagName) );
-			trace("TAGS_XML..tag.(@name==tagName).length():"+TAGS_XML..tag.(@name==tagName).length() );
-			if ( TAGS_XML..tag.(@name==tagName).length() > 0 )
+			Util.log( "resyncTags");
+			TAGS_XML =  <tags>
+						</tags>;
+			
+			//check for tags in clip xml
+			var clips:Clips = Clips.getInstance();
+			var clipTagList:XMLList = clips.CLIPS_XML..tag as XMLList;
+			for each ( var clipTag:XML in clipTagList )
 			{
-				delete TAGS_XML..tag.(@name==tagName)[0];
-				//delete TAGS_XML..tag.(@name==tagName);
-				writeTagsFile();
-			}	
+				addTagIfNew( clipTag.@name );
+			}			
+					
+			refreshTagsXMLList();
+			
 		}
 		public function get dbPath():String
 		{
