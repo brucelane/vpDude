@@ -293,7 +293,6 @@ protected function exploreBtn_clickHandler(event:MouseEvent):void
 
 private function resyncComplete(event:Event):void
 {
-	//TODO this is called 2 times
 	cnv.removeEventListener( Event.COMPLETE, resyncComplete );
 	//setCurrentState("Normal");
 	resyncBtn.enabled = true;
