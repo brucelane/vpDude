@@ -107,7 +107,7 @@ package videopong
 		}
 		public function resyncTags():void
 		{	
-			Util.log( "resyncTags");
+			Util.log( "resyncTags start");
 			TAGS_XML =  <tags>
 							<tag name="own"/>
 						</tags>;
@@ -121,7 +121,7 @@ package videopong
 			}			
 			
 			refreshTagsXMLList();
-			
+			Util.log( "resyncTags end");
 		}
 		public function get dbPath():String
 		{
