@@ -101,7 +101,7 @@ package videopong
 			var localClipXMLFile:String = _dbPath + File.separator + clipId + ".xml" ;
 			var clipXmlFile:File = new File( localClipXMLFile );
 			
-			var clipXml:XML = new XML( readTextFile( clipXmlFile ) );;					
+			var clipXml:XML = new XML( readTextFile( clipXmlFile ) );				
 			//test if tag in clip xml
 			var clipTagList:XMLList = clipXml..tag as XMLList;
 			var foundNewTag:Boolean = true;

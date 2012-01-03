@@ -294,6 +294,8 @@ protected function exploreBtn_clickHandler(event:MouseEvent):void
 private function resyncComplete(event:Event):void
 {
 	cnv.removeEventListener( Event.COMPLETE, resyncComplete );
+	var tags:Tags = Tags.getInstance();
+	tags.resyncTags();
 	//setCurrentState("Normal");
 	resyncBtn.enabled = true;
 	resyncBtn.label="Sync my own folder";
@@ -361,7 +363,7 @@ protected function browseAndConvert():void
 				cnv.deleteFile( parentDocument.dbFolderPath + File.separator + clip.@id + ".xml" );
 				// delete in clips.xml
 				clips.deleteClip( clip.@id, clip.@urllocal );
-				var clipId:String = clip.@id;
+				/*var clipId:String = clip.@id;
 				//delete tag in tags.xml
 				var clipTagList:XMLList = clip..tag as XMLList;
 				var tags:Tags = Tags.getInstance();
@@ -371,7 +373,8 @@ protected function browseAndConvert():void
 					{
 						tags.deleteTag( clipTag.@name );												
 					}
-				}				
+				}
+				*/				
 				// delete thumbs
 				cnv.deleteFile( clip.urlthumb1 );
 				cnv.deleteFile( clip.urlthumb2 );

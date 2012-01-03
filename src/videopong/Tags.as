@@ -5,7 +5,7 @@ package videopong
 	import fr.batchass.*;
 	
 	import mx.collections.XMLListCollection;
-
+	
 	public class Tags
 	{
 		private static var instance:Tags = new Tags();
@@ -27,7 +27,7 @@ package videopong
 			}
 			else trace( "Tags already instanciated." );
 		}
-
+		
 		public static function getInstance():Tags 
 		{
 			return instance;
@@ -93,7 +93,7 @@ package videopong
 		{
 			tagsXMLList = new XMLListCollection( TAGS_XML.tag.@name );
 		}
-
+		
 		public function addTagIfNew( tagToSearch:String ):void
 		{
 			tagToSearch = tagToSearch.toLowerCase();
@@ -105,28 +105,34 @@ package videopong
 			}
 			
 		}
-		public function deleteTag(tagName:String ):void
+		public function resyncTags():void
 		{	
-			trace(tagName);
-			trace("TAGS_XML..tag.(@name==tagName):"+TAGS_XML..tag.(@name==tagName) );
-			trace("TAGS_XML..tag.(@name==tagName).length():"+TAGS_XML..tag.(@name==tagName).length() );
-			if ( TAGS_XML..tag.(@name==tagName).length() > 0 )
+			Util.log( "resyncTags");
+			TAGS_XML =  <tags>
+							<tag name="own"/>
+						</tags>;
+			
+			//check for tags in clip xml
+			var clips:Clips = Clips.getInstance();
+			var clipTagList:XMLList = clips.CLIPS_XML..tag as XMLList;
+			for each ( var clipTag:XML in clipTagList )
 			{
-				delete TAGS_XML..tag.(@name==tagName)[0];
-				//delete TAGS_XML..tag.(@name==tagName);
-				writeTagsFile();
-			}	
+				addTagIfNew( clipTag.@name );
+			}			
+			
+			refreshTagsXMLList();
+			
 		}
 		public function get dbPath():String
 		{
 			return _dbPath;
 		}
-
+		
 		public function set dbPath(value:String):void
 		{
 			_dbPath = value;
 		}
-
-
+		
+		
 	}
 }
