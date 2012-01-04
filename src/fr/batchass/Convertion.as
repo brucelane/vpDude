@@ -47,6 +47,7 @@ package fr.batchass
 		public var countTotal:int = 0;
 		[Bindable]
 		public var frame:int = 0;
+		public var maxFrame:int = 0;
 		[Bindable]
 		public var countNoChange:int = 0;
 		public var nochgFiles:String = "";
@@ -85,11 +86,6 @@ package fr.batchass
 						Util.convertLog( "processConvert, fileToConvert.length:" + fileToConvert.length );
 						convert( fileToConvert[0] );
 					}
-					/* called the resync 2 times
-					else
-					{
-						dispatchEvent( new Event(Event.COMPLETE) );	
-					}*/
 				}
 				else
 				{
@@ -169,19 +165,38 @@ package fr.batchass
 				}
 			}
 		}
-		private function onThumbConvertComplete(clip:Clip):void
+		private function onThumb1ConvertComplete(clip:Clip):void
 		{
-			progress += "Thumb convertion completed:" + clip.clipGeneratedName + "\n";
-			Util.convertLog( "onThumbConvertComplete, ThumbConvert Completed:" + clip.clipGeneratedTitle );
-			Util.convertLog( "onThumbConvertComplete, fileToConvert.length:" + fileToConvert.length );
+			progress += "Thumb1 convertion completed:" + clip.clipGeneratedTitle + "\n";
+			Util.convertLog( "onThumb1ConvertComplete, ThumbConvert Completed:" + clip.clipGeneratedTitle );
+			Util.convertLog( "onThumb1ConvertComplete, fileToConvert.length:" + fileToConvert.length );
 			frame = 0;
 			generate( clip, false );
 		}
+		private function onThumb2ConvertComplete(clip:Clip):void
+		{
+			progress += "Thumb2 convertion completed:" + clip.clipGeneratedTitle + "\n";
+			Util.convertLog( "onThumb2ConvertComplete, ThumbConvert Completed:" + clip.clipGeneratedTitle );
+			Util.convertLog( "onThumb2ConvertComplete, fileToConvert.length:" + fileToConvert.length );
+			frame = 0;		
+		}
+		private function onThumb3ConvertComplete(clip:Clip):void
+		{
+			progress += "Thumb3 convertion completed:" + clip.clipGeneratedTitle + "\n";
+			Util.convertLog( "onThumb3ConvertComplete, ThumbConvert Completed:" + clip.clipGeneratedTitle );
+			Util.convertLog( "onThumb3ConvertComplete, fileToConvert.length:" + fileToConvert.length );
+			frame = 0;
+		}
 		private function onMovieConvertComplete(clip:Clip):void
 		{
-			progress += "Movie convertion completed:" + clip.clipGeneratedName + "\n";
+			progress += "Movie convertion completed:" + clip.clipGeneratedTitle + "\n";
 			Util.convertLog( "onMovieConvertComplete, MovieConvert Completed:" + clip.clipGeneratedTitle );
 			Util.convertLog( "onMovieConvertComplete, fileToConvert.length:" + fileToConvert.length );
+			if ( maxFrame > 0 )
+			{
+				generate( clip, true, 2, maxFrame / 4 );
+				generate( clip, true, 3, maxFrame / 2 );		
+			}
 			// create XML
 			OWN_CLIPS_XML = <video id={clip.clipGeneratedName} urllocal={clip.clipRelativePath} datemodified={clip.clipModificationDate} size={clip.clipSize}> 
 								<urlthumb1>{clip.thumbsPath + "thumb1.jpg"}</urlthumb1>
@@ -257,7 +272,7 @@ package fr.batchass
 		}
 
 		// thumb convert progress
-		private function errorThumbDataHandler(event:ProgressEvent):void
+		private function errorThumb1DataHandler(event:ProgressEvent):void
 		{
 			var process:NativeProcess = event.target as NativeProcess;
 			var data:String = process.standardError.readUTFBytes(process.standardError.bytesAvailable);
@@ -266,18 +281,7 @@ package fr.batchass
 				if ( fileToConvert.length > 0 )
 				{					
 					//progress = "Thumb convertion completed: " + fileToConvert[0].name + "\n";
-					thumb1 = fileToConvert[0].thumbsPath + "thumb1.jpg";
-					if ( thumb1.length > 0 )
-					{
-						var sourceFile:File = new File( thumb1 );
-						if( sourceFile.exists )
-						{
-							//file: copy
-							copyFile( thumb1, fileToConvert[0].thumbsPath + "thumb2.jpg" );
-							copyFile( thumb1, fileToConvert[0].thumbsPath + "thumb3.jpg" );
-						}
-					}
-					onThumbConvertComplete(fileToConvert[0]);
+					onThumb1ConvertComplete(fileToConvert[0]);
 				}
 				//loop busy = false;
 			}
@@ -289,6 +293,103 @@ package fr.batchass
 			if (data.indexOf("Unknown format")>-1)
 			{ 
 				if ( fileToConvert.length > 0 ) progress += "Thumb convertion: Unknown format: " + fileToConvert[0].name + "\n";
+				manageConvertError();
+			}
+			if (data.indexOf("Error while opening file")>-1)
+			{ 
+				if ( fileToConvert.length > 0 ) progress += "Thumb convertion: Error while opening file: " + fileToConvert[0].name + "\n";
+				manageConvertError();
+			}
+			if (data.indexOf("Could not open")>-1)
+			{ 
+				if ( fileToConvert.length > 0 ) progress += "Thumb convertion: Could not open: " + fileToConvert[0].name + "\n";
+				manageConvertError();
+			}
+			if (data.indexOf("already exists. Overwrite")>-1)
+			{ 
+				if ( fileToConvert.length > 0 ) progress += "Thumb convertion: already exists. Overwrite y/N: " + fileToConvert[0].name + "\n";
+				manageConvertError();
+			}
+			Util.ffMpegOutputLog( "NativeProcess errorThumbDataHandler: " + data );
+		}
+		// thumb convert progress
+		private function errorThumb2DataHandler(event:ProgressEvent):void
+		{
+			var process:NativeProcess = event.target as NativeProcess;
+			var data:String = process.standardError.readUTFBytes(process.standardError.bytesAvailable);
+			if (data.indexOf("muxing overhead")>-1) 
+			{
+				if ( fileToConvert.length > 0 )
+				{					
+					//progress = "Thumb convertion completed: " + fileToConvert[0].name + "\n";
+					onThumb2ConvertComplete(fileToConvert[0]);
+				}
+				//loop busy = false;
+			}
+			if (data.indexOf("swf: I/O error occurred")>-1)
+			{ 
+				if ( fileToConvert.length > 0 ) progress += "Thumb convertion: I/O error occurred: " + fileToConvert[0].name + "\n";
+				manageConvertError();
+			}
+			if (data.indexOf("Unknown format")>-1)
+			{ 
+				if ( fileToConvert.length > 0 ) progress += "Thumb convertion: Unknown format: " + fileToConvert[0].name + "\n";
+				manageConvertError();
+			}
+			if (data.indexOf("Error while opening file")>-1)
+			{ 
+				if ( fileToConvert.length > 0 ) progress += "Thumb convertion: Error while opening file: " + fileToConvert[0].name + "\n";
+				manageConvertError();
+			}
+			if (data.indexOf("Could not open")>-1)
+			{ 
+				if ( fileToConvert.length > 0 ) progress += "Thumb convertion: Could not open: " + fileToConvert[0].name + "\n";
+				manageConvertError();
+			}
+			if (data.indexOf("already exists. Overwrite")>-1)
+			{ 
+				if ( fileToConvert.length > 0 ) progress += "Thumb convertion: already exists. Overwrite y/N: " + fileToConvert[0].name + "\n";
+				manageConvertError();
+			}
+			Util.ffMpegOutputLog( "NativeProcess errorThumbDataHandler: " + data );
+		}
+		// thumb convert progress
+		private function errorThumb3DataHandler(event:ProgressEvent):void
+		{
+			var process:NativeProcess = event.target as NativeProcess;
+			var data:String = process.standardError.readUTFBytes(process.standardError.bytesAvailable);
+			if (data.indexOf("muxing overhead")>-1) 
+			{
+				if ( fileToConvert.length > 0 )
+				{					
+					//progress = "Thumb convertion completed: " + fileToConvert[0].name + "\n";
+					onThumb3ConvertComplete(fileToConvert[0]);
+				}
+				//loop busy = false;
+			}
+			if (data.indexOf("swf: I/O error occurred")>-1)
+			{ 
+				if ( fileToConvert.length > 0 ) progress += "Thumb convertion: I/O error occurred: " + fileToConvert[0].name + "\n";
+				manageConvertError();
+			}
+			if (data.indexOf("Unknown format")>-1)
+			{ 
+				if ( fileToConvert.length > 0 ) progress += "Thumb convertion: Unknown format: " + fileToConvert[0].name + "\n";
+				manageConvertError();
+			}
+			if (data.indexOf("Error while opening file")>-1)
+			{ 
+				if ( fileToConvert.length > 0 ) progress += "Thumb convertion: Error while opening file: " + fileToConvert[0].name + "\n";
+				manageConvertError();
+			}
+			if (data.indexOf("Could not open")>-1)
+			{ 
+				if ( fileToConvert.length > 0 ) progress += "Thumb convertion: Could not open: " + fileToConvert[0].name + "\n";
+				manageConvertError();
+			}
+			if (data.indexOf("already exists. Overwrite")>-1)
+			{ 
+				if ( fileToConvert.length > 0 ) progress += "Thumb convertion: already exists. Overwrite y/N: " + fileToConvert[0].name + "\n";
 				manageConvertError();
 			}
 			Util.ffMpegOutputLog( "NativeProcess errorThumbDataHandler: " + data );
@@ -323,6 +424,7 @@ package fr.batchass
 				{	
 					var frameStr:String = data.substring( start, end );
 					frame = int(frameStr);
+					if ( frame > maxFrame ) maxFrame = frame;
 					dispatchEvent( new Event(Event.ADDED) );	
 				}
 			}
@@ -336,11 +438,27 @@ package fr.batchass
 				if ( fileToConvert.length > 0 ) progress += "Movie convertion: Unknown format: " + fileToConvert[0].name + "\n";
 				manageConvertError();
 			}
+			if (data.indexOf("Error while opening file")>-1)
+			{ 
+				if ( fileToConvert.length > 0 ) progress += "Movie convertion: Error while opening file: " + fileToConvert[0].name + "\n";
+				manageConvertError();
+			}
+			if (data.indexOf("Could not open")>-1)
+			{ 
+				if ( fileToConvert.length > 0 ) progress += "Movie convertion: Could not open: " + fileToConvert[0].name + "\n";
+				manageConvertError();
+			}
+			if (data.indexOf("already exists. Overwrite")>-1)
+			{ 
+				if ( fileToConvert.length > 0 ) progress += "Movie convertion: already exists. Overwrite y/N: " + fileToConvert[0].name + "\n";
+				manageConvertError();
+			}
 			Util.ffMpegOutputLog( "NativeProcess errorMovieDataHandler: " + data );
 		}
 		public function start():void
 		{
 			frame = 0;
+			maxFrame = 0;
 			countNew = 0;
 			countDeleted = 0;
 			countChanged = 0;
@@ -383,9 +501,10 @@ package fr.batchass
 		{
 			generate( clip, true );
 		}
-		private function generate( clip:Clip, thumb:Boolean ):void
+		private function generate( clip:Clip, thumb:Boolean, thumbIndex:int = 1, thumbNumber:int = 10 ):void
 		{
 			var outPath:String;
+			var outFile:String;
 			if ( thumb )
 			{
 				outPath = FlexGlobals.topLevelApplication.dldFolderPath + "/thumbs/" + clip.clipGeneratedName + "/";
@@ -425,7 +544,7 @@ package fr.batchass
 						Util.log( "convertion, ffMpegExecutable does not exist: " + FlexGlobals.topLevelApplication.vpFFMpegExePath );
 					}
 					//configComp.ffout.text += "generatePreview, converting " + clipFileName + " to swf.\n";
-					Util.ffMpegOutputLog( "NativeProcess convertion: Converting " + clip.clipGeneratedName + "\n" );
+					Util.ffMpegOutputLog( "NativeProcess convertion: Converting " + clip.clipGeneratedTitle + "\n" );
 					
 					var nativeProcessStartupInfo:NativeProcessStartupInfo = new NativeProcessStartupInfo();
 					nativeProcessStartupInfo.executable = ffMpegExecutable;
@@ -448,8 +567,9 @@ package fr.batchass
 						processArgs[i++] =  "-s";
 						processArgs[i++] = "100x74"; //Frame size must be a multiple of 2
 						processArgs[i++] =  "-ss";
-						processArgs[i++] = "10";//thumbNumber.toString();
-						processArgs[i++] = outPath + "thumb1.jpg";
+						processArgs[i++] = thumbNumber.toString();
+						outFile = outPath + "thumb" + thumbIndex + ".jpg";
+						processArgs[i++] = outFile;
 					} 
 					else 
 					{
@@ -457,28 +577,45 @@ package fr.batchass
 						processArgs[i++] = "avm2";
 						processArgs[i++] = "-s";
 						processArgs[i++] = reso;// default "320x240";
-						processArgs[i++] = outPath + clip.clipGeneratedName + ".swf";
+						outFile = outPath + clip.clipGeneratedName + ".swf";
+						processArgs[i++] = outFile;
 					}
 					processArgs[i++] = "-y";
-					nativeProcessStartupInfo.arguments = processArgs;
 					
-					startFFMpegProcess = new NativeProcess();
-					startFFMpegProcess.start(nativeProcessStartupInfo);
-					startFFMpegProcess.addEventListener(ProgressEvent.STANDARD_OUTPUT_DATA,	outputDataHandler);
-					if ( thumb ) 
+					//test if file already exist, we abort
+					var outF:File =  new File( outFile ); 
+					if ( outF.exists )
 					{
-						progress += "Thumb convertion started:" + clip.clipGeneratedName + "\n";
-						Util.convertLog( "Thumb convertion started:" + clip.clipGeneratedName );
-						startFFMpegProcess.addEventListener(ProgressEvent.STANDARD_ERROR_DATA, errorThumbDataHandler);
+						Util.log( "convertion, abort because already exists: " + outF );
+						countError++;
+						errFiles += currentFilename + " ";
+						if ( fileToConvert.length > 0 ) fileToConvert.shift();
+						busy = false;
 					}
 					else
 					{
-						progress += "Movie convertion started:" + clip.clipGeneratedName + "\n";
-						Util.convertLog( "Movie convertion started:" + clip.clipGeneratedName );
-						startFFMpegProcess.addEventListener(ProgressEvent.STANDARD_ERROR_DATA, errorMovieDataHandler);						
+						nativeProcessStartupInfo.arguments = processArgs;
+						
+						startFFMpegProcess = new NativeProcess();
+						startFFMpegProcess.start(nativeProcessStartupInfo);
+						startFFMpegProcess.addEventListener(ProgressEvent.STANDARD_OUTPUT_DATA,	outputDataHandler);
+						if ( thumb ) 
+						{
+							progress += "Thumb " + thumbIndex + " (frame " + thumbNumber + ") convertion started:" + clip.clipGeneratedTitle + "\n";
+							Util.convertLog( "Thumb " + thumbIndex + " (frame " + thumbNumber + ") convertion started:" + clip.clipGeneratedTitle );
+							if ( thumbIndex == 1 ) startFFMpegProcess.addEventListener(ProgressEvent.STANDARD_ERROR_DATA, errorThumb1DataHandler);					
+							if ( thumbIndex == 2 ) startFFMpegProcess.addEventListener(ProgressEvent.STANDARD_ERROR_DATA, errorThumb2DataHandler);					
+							if ( thumbIndex == 3 ) startFFMpegProcess.addEventListener(ProgressEvent.STANDARD_ERROR_DATA, errorThumb3DataHandler);					
+						}
+						else
+						{
+							progress += "Movie convertion started:" + clip.clipGeneratedTitle + "\n";
+							Util.convertLog( "Movie convertion started:" + clip.clipGeneratedTitle );
+							startFFMpegProcess.addEventListener(ProgressEvent.STANDARD_ERROR_DATA, errorMovieDataHandler);						
+						}
+						startFFMpegProcess.addEventListener(Event.STANDARD_OUTPUT_CLOSE, processClose );
+						startFFMpegProcess.addEventListener(NativeProcessExitEvent.EXIT, onExit);										
 					}
-					startFFMpegProcess.addEventListener(Event.STANDARD_OUTPUT_CLOSE, processClose );
-					startFFMpegProcess.addEventListener(NativeProcessExitEvent.EXIT, onExit);				
 				}
 				catch (e:Error)
 				{
