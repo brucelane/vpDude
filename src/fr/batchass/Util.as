@@ -148,11 +148,29 @@ package fr.batchass
 			return fileName;
 		}
 		
-		public static function getFileNameWithoutExtension( url:String ):String
+		public static function getFileNameWithoutTrailingNumbersAndExtension( url:String ):String
 		{
+			var lastDot:int;
 			var fileName:String = getFileName( url );
-			var lastDot:int = fileName.lastIndexOf( '.' );
+			
+			var patternNumber:RegExp = /\d*\./g;  
+			fileName = fileName.replace(patternNumber,".");
+			
+			var patternRemoveSpecial:RegExp = /[-_().]\./g;  
+			fileName = fileName.replace(patternRemoveSpecial,".");
+			
+			
+			lastDot = fileName.lastIndexOf( '.' );
 			if ( lastDot > -1 ) fileName = fileName.substr( 0, lastDot );
+			
+			if ( fileName.length < 1 )
+			{
+				//all characters removed
+				fileName = getFileName( url );
+				lastDot = fileName.lastIndexOf( '.' );
+				if ( lastDot > -1 ) fileName = fileName.substr( 0, lastDot );
+			}
+			
 			return fileName;
 		}
 		

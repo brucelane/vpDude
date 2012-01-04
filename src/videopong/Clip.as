@@ -28,7 +28,7 @@ package videopong
 			clipRelativePath = clipPath.substr( FlexGlobals.topLevelApplication.ownFolderPath.length + 1 );
 			clipGeneratedName = Util.getFileNameWithSafePath( clipRelativePath );
 			clipGeneratedTitle = Util.getFileName( clipRelativePath );
-			clipGeneratedTitleWithoutExtension = Util.getFileNameWithoutExtension( clipRelativePath );
+			clipGeneratedTitleWithoutExtension = Util.getFileNameWithoutTrailingNumbersAndExtension( clipRelativePath );
 			thumbsPath = FlexGlobals.topLevelApplication.dldFolderPath + "/thumbs/" + clipGeneratedName + "/";
 			swfPath = FlexGlobals.topLevelApplication.dldFolderPath + "/preview/" + clipGeneratedName + "/";
 		}
