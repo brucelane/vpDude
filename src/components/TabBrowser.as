@@ -13,6 +13,9 @@ import videopong.*;
 private var airApp : Object = this;
 private var cache:CacheManager;
 private var timer:Timer;
+private var session:Session = Session.getInstance();
+/*[Bindable]
+private var vpFullUrl:String = "";*/
 
 //inject a reference to "this" into the HTML dom
 private function onHTMLComplete() : void
@@ -63,7 +66,7 @@ private function e4xLoadComplete( event:Event ):void
 	{
 		Util.log( 'e4xLoadComplete, clip does not exist' );
 		// download thumbs and video if not in cache
-		if ( !cache ) cache = new CacheManager( parentDocument.dldFolderPath );
+		if ( !cache ) cache = new CacheManager( session.dldFolderPath );
 		cache.downloadClipFiles( clipXml..urlthumb1, clipXml..urldownload, clipXml..urlpreview );
 		clipXml.dlddate = Util.nowDate;
 		// add originaltags

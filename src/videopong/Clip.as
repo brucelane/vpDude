@@ -18,19 +18,22 @@ package videopong
 		private var _clipGeneratedTitleWithoutExtension:String;
 		private var _thumbsPath:String;
 		private var _swfPath:String;
-		//private var _isThumb:Boolean;
+		private var session:Session = Session.getInstance();
+		private var _maxFrame:int;
+
 		public function Clip( lstFile:File )
 		{
 			name = lstFile.name;
 			clipPath = lstFile.nativePath;
 			clipModificationDate = lstFile.modificationDate.toUTCString();
 			clipSize = lstFile.size.toString();	
-			clipRelativePath = clipPath.substr( FlexGlobals.topLevelApplication.ownFolderPath.length + 1 );
+			clipRelativePath = clipPath.substr( session.ownFolderPath.length + 1 );
 			clipGeneratedName = Util.getFileNameWithSafePath( clipRelativePath );
 			clipGeneratedTitle = Util.getFileName( clipRelativePath );
 			clipGeneratedTitleWithoutExtension = Util.getFileNameWithoutTrailingNumbersAndExtension( clipRelativePath );
-			thumbsPath = FlexGlobals.topLevelApplication.dldFolderPath + "/thumbs/" + clipGeneratedName + "/";
-			swfPath = FlexGlobals.topLevelApplication.dldFolderPath + "/preview/" + clipGeneratedName + "/";
+			thumbsPath = session.dldFolderPath + "/thumbs/" + clipGeneratedName + "/";
+			swfPath = session.dldFolderPath + "/preview/" + clipGeneratedName + "/";
+			_maxFrame = 0;
 		}
 
 		public function get name():String
@@ -131,6 +134,16 @@ package videopong
 		public function set swfPath(value:String):void
 		{
 			_swfPath = value;
+		}
+
+		public function get maxFrame():int
+		{
+			return _maxFrame;
+		}
+
+		public function set maxFrame(value:int):void
+		{
+			_maxFrame = value;
 		}
 
 

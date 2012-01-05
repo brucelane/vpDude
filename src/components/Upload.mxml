@@ -6,16 +6,12 @@
 					width="100%" height="100%">
 		<fx:Script source="TabUpload.as" />
 		
-		
 		<s:VGroup width="820" paddingLeft="3" paddingRight="3" paddingTop="3" paddingBottom="3">
 			<s:HGroup paddingLeft="5">
 				<s:Button label="&lt;" width="30" height="18" toolTip="back" click="htmlUploadBrowser.historyBack()"/>
 				<s:Button label="&gt;" width="30" height="18" toolTip="forward" click="htmlUploadBrowser.historyForward()"/>
 				<s:Button label="Reload" height="18" click="htmlUploadBrowser.reload()"/>
 			</s:HGroup>
-			<mx:HTML id="htmlUploadBrowser" width="815" height="520" location="{parentDocument.vpUploadUrl}" complete="onHTMLComplete()" />
-			
+			<mx:HTML id="htmlUploadBrowser" width="815" height="520" location="{session.vpUploadUrl}" complete="onHTMLComplete()" />
 		</s:VGroup>
-		
-		
-	</s:NavigatorContent>
+</s:NavigatorContent>

@@ -30,7 +30,7 @@
 			</s:HGroup>
 			<s:HGroup>
 				<s:Label width="{lblWidth}" text="Local own videos path:" verticalAlign="bottom"/>
-				<s:TextInput width="{tiWidth}" text="{parentDocument.ownFolderPath}" id="ownTextInput"/>
+				<s:TextInput width="{tiWidth}" text="{session.ownFolderPath}" id="ownTextInput"/>
 				<s:Button label="Select" toolTip="select my own folder" id="browseOwnPathBtn" click="browseOwnPathBtn_clickHandler(event)"/>	
 				<s:Button label="Show folder" toolTip="show my own files" id="exploreBtn" click="exploreBtn_clickHandler(event)"/>
 			</s:HGroup>

@@ -17,7 +17,7 @@ package videopong
 		[Bindable]
 		public var tagsXMLList:XMLListCollection = new XMLListCollection(TAGS_XML.tag.@name);
 		
-		private static var _dbPath:String;
+		private var session:Session = Session.getInstance();
 		
 		public function Tags( )
 		{
@@ -35,12 +35,11 @@ package videopong
 		
 		public function loadTagsFile():void 
 		{
-			tagsXmlPath = _dbPath + File.separator + "tags.xml";
+			tagsXmlPath = session.dbFolderPath + File.separator + "tags.xml";
 			var isConfigured:Boolean = false;
 			var tagsFile:File = File.applicationStorageDirectory.resolvePath( tagsXmlPath );
 			try
 			{
-				
 				if ( !tagsFile.exists )
 				{
 					Util.log( "tags.xml does not exist" );
@@ -68,7 +67,7 @@ package videopong
 		}
 		public function writeTagsFile():void 
 		{
-			tagsXmlPath = _dbPath + File.separator + "tags.xml";
+			tagsXmlPath = session.dbFolderPath + File.separator + "tags.xml";
 			var tagsFile:File = File.applicationStorageDirectory.resolvePath( tagsXmlPath );
 			// sort the TAGS_XML
 			var arrayToSort:Array = new Array();
@@ -123,16 +122,5 @@ package videopong
 			refreshTagsXMLList();
 			Util.log( "resyncTags end");
 		}
-		public function get dbPath():String
-		{
-			return _dbPath;
-		}
-		
-		public function set dbPath(value:String):void
-		{
-			_dbPath = value;
-		}
-		
-		
 	}
 }

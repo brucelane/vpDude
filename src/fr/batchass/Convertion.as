@@ -47,7 +47,6 @@ package fr.batchass
 		public var countTotal:int = 0;
 		[Bindable]
 		public var frame:int = 0;
-		public var maxFrame:int = 0;
 		[Bindable]
 		public var countNoChange:int = 0;
 		public var nochgFiles:String = "";
@@ -59,6 +58,7 @@ package fr.batchass
 		[Bindable]
 		public var reso:String = "320x240";
 		private var OWN_CLIPS_XML:XML;
+		private var session:Session = Session.getInstance();
 		
 		public function Convertion()
 		{
@@ -84,24 +84,27 @@ package fr.batchass
 					{
 						busy = true;
 						Util.convertLog( "processConvert, fileToConvert.length:" + fileToConvert.length );
-						convert( fileToConvert[0] );
+						generate( fileToConvert[0], false );
 					}
 				}
 				else
 				{
 					//busy
-					if ( !startFFMpegProcess.running ) 
+					if ( startFFMpegProcess )
 					{
-						Util.convertLog( "processConvert, startFFMpegProcess not running, busy becomes false" );
-						
-						if ( fileToConvert.length > 0 ) 
+						if ( !startFFMpegProcess.running ) 
 						{
-							countDone++;
-							fileToConvert.shift();
-							Util.convertLog( "processConvert, fileToConvert.shift" );
-							Util.convertLog( "processConvert, fileToConvert.length:" + fileToConvert.length );
+							Util.convertLog( "processConvert, startFFMpegProcess not running, busy becomes false" );
+							
+							if ( fileToConvert.length > 0 ) 
+							{
+								countDone++;
+								fileToConvert.shift();
+								Util.convertLog( "processConvert, fileToConvert.shift" );
+								Util.convertLog( "processConvert, fileToConvert.length:" + fileToConvert.length );
+							}
+							busy = false;
 						}
-						busy = false;
 					}
 				}
 				
@@ -139,14 +142,14 @@ package fr.batchass
 			else
 			{
 				// check if file changed
-				if ( clips.fileChanged( clip.clipRelativePath, FlexGlobals.topLevelApplication.ownFolderPath ) )
+				if ( clips.fileChanged( clip.clipRelativePath, session.ownFolderPath ) )
 				{
 					// delete thumbs and preview swf
 					deleteThumbs( clip.thumbsPath );
 					deleteFile( clip.swfPath + clip.clipGeneratedName + ".swf" );
 					// modify xml
 					// read clip xml file
-					var localClipXMLFile:String = FlexGlobals.topLevelApplication.dbFolderPath + File.separator + clip.clipGeneratedName + ".xml" ;
+					var localClipXMLFile:String = session.dbFolderPath + File.separator + clip.clipGeneratedName + ".xml" ;
 					var clipXmlFile:File = new File( localClipXMLFile );
 					var clipXml:XML = new XML( readTextFile( clipXmlFile ) );					
 					clipXml.@datemodified = clip.clipModificationDate;
@@ -178,47 +181,45 @@ package fr.batchass
 			progress += "Thumb1 convertion completed:" + clip.clipGeneratedTitle + "\n";
 			Util.convertLog( "onThumb1ConvertComplete, ThumbConvert Completed:" + clip.clipPath );
 			Util.convertLog( "onThumb1ConvertComplete, fileToConvert.length:" + fileToConvert.length );
-			frame = 0;
-			generate( clip, false );
+				generate( clip, true, 2, clip.maxFrame / 3 );
 		}
 		private function onThumb2ConvertComplete(clip:Clip):void
 		{
 			progress += "Thumb2 convertion completed:" + clip.clipGeneratedTitle + "\n";
 			Util.convertLog( "onThumb2ConvertComplete, ThumbConvert Completed:" + clip.clipPath );
 			Util.convertLog( "onThumb2ConvertComplete, fileToConvert.length:" + fileToConvert.length );
-			frame = 0;		
+				generate( clip, true, 3, clip.maxFrame / 2 );	
 		}
 		private function onThumb3ConvertComplete(clip:Clip):void
 		{
 			progress += "Thumb3 convertion completed:" + clip.clipGeneratedTitle + "\n";
 			Util.convertLog( "onThumb3ConvertComplete, ThumbConvert Completed:" + clip.clipPath );
 			Util.convertLog( "onThumb3ConvertComplete, fileToConvert.length:" + fileToConvert.length );
-			frame = 0;
 		}
 		private function onMovieConvertComplete(clip:Clip):void
 		{
 			progress += "Movie convertion completed:" + clip.clipGeneratedTitle + "\n";
 			Util.convertLog( "onMovieConvertComplete, MovieConvert Completed:" + clip.clipPath );
 			Util.convertLog( "onMovieConvertComplete, fileToConvert.length:" + fileToConvert.length );
-			if ( maxFrame > 0 )
+			if ( clip.maxFrame > 0 )
 			{
-				generate( clip, true, 2, maxFrame / 4 );
-				generate( clip, true, 3, maxFrame / 2 );		
+				generate( clip, true, 1, clip.maxFrame / 4 );
 			}
 			// create XML
 			OWN_CLIPS_XML = <video id={clip.clipGeneratedName} urllocal={clip.clipRelativePath} datemodified={clip.clipModificationDate} size={clip.clipSize}> 
+								<frames>{clip.maxFrame}</frames>
 								<urlthumb1>{clip.thumbsPath + "thumb1.jpg"}</urlthumb1>
 								<urlthumb2>{clip.thumbsPath + "thumb2.jpg"}</urlthumb2>
 								<urlthumb3>{clip.thumbsPath + "thumb3.jpg"}</urlthumb3>
 								<urlpreview>{clip.swfPath + clip.clipGeneratedName + ".swf"}</urlpreview>
 								<clip name={clip.clipGeneratedTitle} />
-								<creator name={FlexGlobals.topLevelApplication.userName}/>
+								<creator name={session.userName}/>
 								<tags>
 									<tag name="own"/>
 								</tags>
 							</video>;
 			var tags:Tags = Tags.getInstance();
-			tags.addTagIfNew( "own" );
+			//useless ? tags.addTagIfNew( "own" );
 			if ( clip.clipRelativePath.length > 0 )
 			{
 				var folders:Array = clip.clipRelativePath.split( File.separator );
@@ -418,7 +419,6 @@ package fr.batchass
 			{
 				if ( fileToConvert.length > 0 )
 				{					
-					//progress = "Movie convertion completed: " + fileToConvert[0].name + "\n";
 					onMovieConvertComplete(fileToConvert[0]);
 				}
 				busy = false;
@@ -432,7 +432,7 @@ package fr.batchass
 				{	
 					var frameStr:String = data.substring( start, end );
 					frame = int(frameStr);
-					if ( frame > maxFrame ) maxFrame = frame;
+					if ( frame > fileToConvert[0].maxFrame ) fileToConvert[0].maxFrame = frame;
 					dispatchEvent( new Event(Event.ADDED) );	
 				}
 			}
@@ -466,7 +466,6 @@ package fr.batchass
 		public function start():void
 		{
 			frame = 0;
-			maxFrame = 0;
 			countNew = 0;
 			countDeleted = 0;
 			countChanged = 0;
@@ -501,25 +500,25 @@ package fr.batchass
 			catch (error:Error)
 			{
 				Util.errorLog( "copyFile Error:" + error.message );
+				countError++;
+				errFiles += currentFilename + " ";
+				if ( fileToConvert.length > 0 ) fileToConvert.shift();
+				busy = false;
 			}			
 		}
 		
 		// convertion
-		private function convert( clip:Clip ):void
-		{
-			generate( clip, true );
-		}
 		private function generate( clip:Clip, thumb:Boolean, thumbIndex:int = 1, thumbNumber:int = 10 ):void
 		{
 			var outPath:String;
 			var outFile:String;
 			if ( thumb )
 			{
-				outPath = FlexGlobals.topLevelApplication.dldFolderPath + "/thumbs/" + clip.clipGeneratedName + "/";
+				outPath = session.dldFolderPath + "/thumbs/" + clip.clipGeneratedName + "/";
 			}
 			else
 			{
-				outPath = FlexGlobals.topLevelApplication.dldFolderPath + "/preview/" + clip.clipGeneratedName + "/";				
+				outPath = session.dldFolderPath + "/preview/" + clip.clipGeneratedName + "/";				
 				
 			}
 			var outFolder:File = new File( outPath );
@@ -546,12 +545,11 @@ package fr.batchass
 			{
 				try
 				{
-					var ffMpegExecutable:File = File.applicationStorageDirectory.resolvePath( FlexGlobals.topLevelApplication.vpFFMpegExePath );
+					var ffMpegExecutable:File = File.applicationStorageDirectory.resolvePath( session.vpFFMpegExePath );
 					if ( !ffMpegExecutable.exists )
 					{
-						Util.log( "convertion, ffMpegExecutable does not exist: " + FlexGlobals.topLevelApplication.vpFFMpegExePath );
+						Util.log( "convertion, ffMpegExecutable does not exist: " + session.vpFFMpegExePath );
 					}
-					//configComp.ffout.text += "generatePreview, converting " + clipFileName + " to swf.\n";
 					Util.ffMpegOutputLog( "NativeProcess convertion: Converting " + clip.clipGeneratedTitle + "\n" );
 					
 					var nativeProcessStartupInfo:NativeProcessStartupInfo = new NativeProcessStartupInfo();
@@ -590,6 +588,13 @@ package fr.batchass
 					}
 					processArgs[i++] = "-y";
 					
+					var args:String = " ";
+					for each (var arg:String in processArgs)
+					{
+						args += arg + " ";
+					}
+					
+					Util.convertLog( "generate, command line: " + session.vpFFMpegExePath + args );
 					//test if file already exist, we abort
 					var outF:File =  new File( outFile ); 
 					if ( outF.exists )

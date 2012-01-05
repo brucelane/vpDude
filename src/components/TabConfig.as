@@ -2,6 +2,8 @@ import components.*;
 
 import flash.events.*;
 import flash.filesystem.File;
+import flash.net.URLRequest;
+import flash.net.navigateToURL;
 
 import flashx.textLayout.events.StatusChangeEvent;
 
@@ -64,6 +66,7 @@ private var validExtensions:Array = ["avi", "mov", "mp4", "flv", "qt", "swf", "m
 
 
 private var cnv:Convertion = Convertion.getInstance(); 
+private var session:Session = Session.getInstance();
 
 protected function config_preinitializeHandler(event:FlexEvent):void
 {
@@ -81,21 +84,17 @@ protected function config_preinitializeHandler(event:FlexEvent):void
 			CONFIG_XML = new XML( readTextFile( configFile ) );
 			
 			userName = CONFIG_XML..username[0].toString();
-			parentDocument.userName = userName;
+			session.userName = userName;
 			password = CONFIG_XML..pwd[0].toString();
 			for ( var i:uint = 0; i < password.length; i++ )
 			{
 				hiddenPassword += "*";
 			}
 			cnv.reso = CONFIG_XML..reso[0].toString();
-			parentDocument.vpFolderPath = File.applicationStorageDirectory.nativePath;
-/*			parentDocument.vpFolderPath = CONFIG_XML..db[0].toString();
-			if ( !parentDocument.vpFolderPath || parentDocument.vpFolderPath.length == 0 )
-			{
-				parentDocument.vpFolderPath = File.applicationStorageDirectory.nativePath;
-			}*/			
-			vpDbPath = parentDocument.vpFolderPath;
-			parentDocument.ownFolderPath = CONFIG_XML..own[0].toString();
+			session.vpFolderPath = File.applicationStorageDirectory.nativePath;
+		
+			vpDbPath = session.vpFolderPath;
+			session.ownFolderPath = CONFIG_XML..own[0].toString();
 			isConfigured = true;
 		}
 	}
@@ -110,10 +109,10 @@ protected function config_preinitializeHandler(event:FlexEvent):void
 }
 private function createEncodedVars():void
 {
-	var fullUrlToEncode:String = parentDocument.vpUrl + "?login=" + escape(userName) + "&password=" + escape(password);
-	var fullUpUrlToEncode:String = parentDocument.vpUpUrl + "?login=" + escape(userName) + "&password=" + escape(password);
-	parentDocument.vpFullUrl = fullUrlToEncode;
-	parentDocument.vpUploadUrl = fullUpUrlToEncode;
+	var fullUrlToEncode:String = session.vpUrl + "?login=" + escape(userName) + "&password=" + escape(password);
+	var fullUpUrlToEncode:String = session.vpUpUrl + "?login=" + escape(userName) + "&password=" + escape(password);
+	session.vpFullUrl = fullUrlToEncode;
+	session.vpUploadUrl = fullUpUrlToEncode;
 
 }
 protected function config_creationCompleteHandler(event:FlexEvent):void
@@ -128,14 +127,14 @@ protected function config_creationCompleteHandler(event:FlexEvent):void
 		}
 		else
 		{
-			Util.log( "config_creationCompleteHandler, parentDocument is null, maybe no internet cnx? " );		
+			Util.log( "config_creationCompleteHandler, parentDocument is null, when no internet cnx..." );		
 		}
 	}
 	else
 	{
-		parentDocument.vpFolderPath = File.documentsDirectory.resolvePath( "vpdude/" ).nativePath;
-		parentDocument.ownFolderPath = File.documentsDirectory.resolvePath( "vpdude/own/" ).nativePath;
-		vpDbPath = parentDocument.vpFolderPath;
+		session.vpFolderPath = File.documentsDirectory.resolvePath( "vpdude/" ).nativePath;
+		session.ownFolderPath = File.documentsDirectory.resolvePath( "vpdude/own/" ).nativePath;
+		vpDbPath = session.vpFolderPath;
 	}
 	cnv = Convertion.getInstance();
 	cnv.addEventListener( Event.COMPLETE, resyncComplete );
@@ -155,14 +154,14 @@ protected function pwdTextInput_changeHandler(event:TextOperationEvent):void
 protected function applyBtn_clickHandler(event:MouseEvent):void
 {
 	var isChanged:Boolean = false;
-	if ( userName != userTextInput.text || parentDocument.ownFolderPath != ownTextInput.text || cnv.reso != resoTextInput.text ) 
+	if ( userName != userTextInput.text || session.ownFolderPath != ownTextInput.text || cnv.reso != resoTextInput.text ) 
 	{
 		isChanged = true;
 		userName = userTextInput.text;
-		parentDocument.userName = userName;
-		parentDocument.ownFolderPath = ownTextInput.text;
+		session.userName = userName;
+		session.ownFolderPath = ownTextInput.text;
 		cnv.reso = resoTextInput.text;
-		checkFolder( parentDocument.ownFolderPath );
+		checkFolder( session.ownFolderPath );
 	}
 	if ( passwordChanged ) 
 	{
@@ -175,14 +174,8 @@ protected function applyBtn_clickHandler(event:MouseEvent):void
 		}
 		pwdTextInput.text = hiddenPassword;
 	}
-	/*if ( parentDocument.vpFolderPath != dbTextInput.text ) 
-	{
-		isChanged = true;
-		// Copy db to new location
-		copyFolders( new File( parentDocument.vpFolderPath ), dbTextInput.text );
-	}*/
 	if ( isChanged ) parentDocument.statusText.text = "Configuration saved";
-	checkFolder( parentDocument.vpFolderPath );
+	checkFolder( session.vpFolderPath );
 	writeFolderXmlFile();
 
 	createEncodedVars();
@@ -198,8 +191,8 @@ private function writeFolderXmlFile():void
 	CONFIG_XML = <config> 
 					<username>{userName}</username>
 					<pwd>{password}</pwd>
-					<db>{parentDocument.vpFolderPath}</db>
-					<own>{parentDocument.ownFolderPath}</own>
+					<db>{session.vpFolderPath}</db>
+					<own>{session.ownFolderPath}</own>
 					<reso>{cnv.reso}</reso>
 				 </config>;
 	var folderFile:File = File.applicationStorageDirectory.resolvePath( defaultConfigXmlPath );
@@ -243,7 +236,7 @@ private function ownFolderSelection(event:Event):void
 	
 	if (event.type === Event.SELECT) 
 	{
-		parentDocument.ownFolderPath = file.nativePath;
+		session.ownFolderPath = file.nativePath;
 	}		
 }
 
@@ -267,27 +260,25 @@ private function checkFolder( folderPath:String ):void
 	else
 	{
 		//create subfolder structure
-		var dldFolder:File = new File( parentDocument.dldFolderPath );
+		var dldFolder:File = new File( session.dldFolderPath );
 		dldFolder.createDirectory();
-		Util.log('Created: ' + parentDocument.dldFolderPath);
-		var dbFolder:File = new File( parentDocument.dbFolderPath );
+		Util.log('Created: ' + session.dldFolderPath);
+		var dbFolder:File = new File( session.dbFolderPath );
 		dbFolder.createDirectory();
-		Util.log('Created: ' + parentDocument.dbFolderPath);	
+		Util.log('Created: ' + session.dbFolderPath);	
 	}
 }
 
 protected function exploreBtn_clickHandler(event:MouseEvent):void
 {
 	// added june 2011 for mac: "file://"
-	if ( parentDocument.os == "Mac" )
+	if ( session.os == "Mac" )
 	{
-		navigateToURL(new URLRequest("file://" + parentDocument.ownFolderPath));
+		navigateToURL(new URLRequest("file://" + session.ownFolderPath));
 	}
 	else
 	{
-		navigateToURL(new URLRequest( parentDocument.ownFolderPath));
-		//var file:File = new File( parentDocument.ownFolderPath );
-		//file.browse();
+		navigateToURL(new URLRequest( session.ownFolderPath));
 	}
 }
 
@@ -335,14 +326,14 @@ protected function browseAndConvert():void
 	summary = "";
 	cnv.progress = "";
 	progress = "";
-	if ( parentDocument.ownFolderPath != ownTextInput.text ) 
+	if ( session.ownFolderPath != ownTextInput.text ) 
 	{
-		parentDocument.ownFolderPath = ownTextInput.text;
+		session.ownFolderPath = ownTextInput.text;
 	}
 	Util.errorLog("calling cnv.start");
 	cnv.start();
 	
-	var selectedDirectory:File = new File( parentDocument.ownFolderPath );
+	var selectedDirectory:File = new File( session.ownFolderPath );
 	// Get directory listing
 	ownFiles = new ArrayCollection( selectedDirectory.getDirectoryListing() );
 	
@@ -355,12 +346,12 @@ protected function browseAndConvert():void
 		//test if own file
 		if ( clip.@urllocal )
 		{
-			var searchedFile:File = new File( parentDocument.ownFolderPath + File.separator + clip.@urllocal );
+			var searchedFile:File = new File( session.ownFolderPath + File.separator + clip.@urllocal );
 			// search for file is own folder
 			if ( !searchedFile.exists ) 
 			{
 				// delete xml file
-				cnv.deleteFile( parentDocument.dbFolderPath + File.separator + clip.@id + ".xml" );
+				cnv.deleteFile( session.dbFolderPath + File.separator + clip.@id + ".xml" );
 				// delete in clips.xml
 				clips.deleteClip( clip.@id, clip.@urllocal );
 				/*var clipId:String = clip.@id;
@@ -380,11 +371,11 @@ protected function browseAndConvert():void
 				cnv.deleteFile( clip.urlthumb2 );
 				cnv.deleteFile( clip.urlthumb3 );
 				// delete thumbs folder
-				deleteFolder( parentDocument.dldFolderPath+ File.separator + "thumbs" + File.separator + clip.@id );
+				deleteFolder( session.dldFolderPath+ File.separator + "thumbs" + File.separator + clip.@id );
 				// delete preview
 				cnv.deleteFile( clip.urlpreview );
 				// delete preview folder
-				deleteFolder( parentDocument.dldFolderPath+ File.separator + "preview" + File.separator + clip.@id );
+				deleteFolder( session.dldFolderPath+ File.separator + "preview" + File.separator + clip.@id );
 				cnv.countDeleted++;
 				cnv.delFiles += clip.@id + " ";
 			}		

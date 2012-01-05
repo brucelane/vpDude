@@ -17,7 +17,7 @@
 				<s:Label id="remaining"  />
 				
 			</s:HGroup>
-			<mx:HTML id="htmlBrowser" width="815" height="520" location="{parentDocument.vpFullUrl}" complete="onHTMLComplete()" htmlText="&lt;H1 align='center'&gt;Use config tab&lt;/H1&gt;" />
+			<mx:HTML id="htmlBrowser" width="815" height="520" location="{session.vpFullUrl}" complete="onHTMLComplete()" htmlText="&lt;H1 align='center'&gt;Use config tab&lt;/H1&gt;" />
 			
 		</s:VGroup>
 	

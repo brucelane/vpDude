@@ -16,9 +16,9 @@ package videopong
 		// Collection of all the clips
 		[Bindable]
 		public var clipsXMLList:XMLListCollection = new XMLListCollection(CLIPS_XML.video);
-		private static var _dbPath:String;		
 		private static var clipsXmlPath:String;
 		private var _acFilter:ArrayCollection;
+		private var session:Session = Session.getInstance();
 		
 		public function Clips()
 		{
@@ -35,7 +35,7 @@ package videopong
 		}
 		public function loadClipsFile():void 
 		{
-			clipsXmlPath = _dbPath + File.separator + "clips.xml";
+			clipsXmlPath = session.dbFolderPath + File.separator + "clips.xml";
 			var isConfigured:Boolean = false;
 			var clipsFile:File = File.applicationStorageDirectory.resolvePath( clipsXmlPath );
 			try
@@ -73,7 +73,7 @@ package videopong
 		}*/
 		public function writeClipsFile(refreshDatabind:Boolean):void 
 		{
-			clipsXmlPath = _dbPath + File.separator + "clips.xml";
+			clipsXmlPath = session.dbFolderPath + File.separator + "clips.xml";
 			var clipsFile:File = File.applicationStorageDirectory.resolvePath( clipsXmlPath );
 			
 			// write the text file
@@ -88,7 +88,7 @@ package videopong
 		// write one clip xml file in db
 		public function writeClipXmlFile( clipId:String, clipXml:XML ):void
 		{
-			var localClipXMLFile:String = _dbPath + File.separator + clipId + ".xml" ;
+			var localClipXMLFile:String = session.dbFolderPath + File.separator + clipId + ".xml" ;
 			var clipXmlFile:File = new File( localClipXMLFile );
 			
 			// write the text file
@@ -98,7 +98,7 @@ package videopong
 		public function addTagIfNew( tag:String, clipId:String, refreshDatabind:Boolean ):void
 		{
 			//read clip xml file
-			var localClipXMLFile:String = _dbPath + File.separator + clipId + ".xml" ;
+			var localClipXMLFile:String = session.dbFolderPath + File.separator + clipId + ".xml" ;
 			var clipXmlFile:File = new File( localClipXMLFile );
 			
 			var clipXml:XML = new XML( readTextFile( clipXmlFile ) );				
@@ -137,7 +137,7 @@ package videopong
 		public function removeTags( clipId:String ):void
 		{
 			//read clip xml file
-			var localClipXMLFile:String = _dbPath + File.separator + clipId + ".xml" ;
+			var localClipXMLFile:String = session.dbFolderPath + File.separator + clipId + ".xml" ;
 			var clipXmlFile:File = new File( localClipXMLFile );
 			
 			var clipXml:XML = new XML( readTextFile( clipXmlFile ) );;					
@@ -320,16 +320,5 @@ package videopong
 			if ( nbFound >= _acFilter.length ) isMatch = true;
 			return isMatch;
 		}
-
-		public function get dbPath():String
-		{
-			return _dbPath;
-		}
-		
-		public function set dbPath(value:String):void
-		{
-			_dbPath = value;
-		}
-
 	}
 }

@@ -19,9 +19,10 @@
 			{
 				// check parentDocument for null value, because 1st time not accessible
 				if ( parentDocument ) version = parentDocument.currentVersion;
-				htm = 
-					"<h2>vpDude</h2><br />" +
-					version + " <br />" +
+				var start:String = "<h2>vpDude</h2><br />";
+				if ( version ) start += version;
+				htm = start +
+					"<br />" +
 					"<br />" +
 					"<br />" +
 					"vpDude is a free tool for <a href='http://www.videopong.net'>videopong.net</a> -users to handle downloaded and own clips in a platform- and vj-tool- independent way. " +

@@ -20,7 +20,6 @@ import flash.net.URLLoaderDataFormat;
 import flash.net.URLRequest;
 import flash.net.URLStream;
 import flash.net.navigateToURL;
-import flash.system.Capabilities;
 import flash.utils.ByteArray;
 
 import fr.batchass.*;
@@ -36,66 +35,22 @@ import mx.managers.DragManager;
 import videopong.*;
 
 private var monitor:URLMonitor;
-public var connected:Boolean;
 
-public var vpDudeFiles:String = "https://www.videopong.net/vpdudefiles/";
-public var vpRootUrl:String = "https://www.videopong.net/";
-public var vpUrl:String = vpRootUrl + "vpdude/";
-public var vpUpUrl:String = vpRootUrl + "vpdudeup/";
-// ffmpeg file name depending on OS
-private var vpFFMpeg:String;
-public var vpFFMpegExePath:String;
 
-[Bindable]
-public var vpFullUrl:String = vpUrl;
-[Bindable]
-public var vpUploadUrl:String = vpUpUrl;
 [Bindable]
 protected var downloading:Boolean = false;
 [Bindable]
 public var currentVersion:String = "";
 
-public var dldFolderPath:String;
-public var dbFolderPath:String;
-public var os:String;
 public var search:Search;
 public var updateTab:UpdateTab;
-public var userName:String;
 
-// path to vpDude folder
-private var _vpFolderPath:String;
-
-private  var urlStream:URLStream;
-private  var fileStream:FileStream;
-private  var _updateUrl:String;
-private  var updateFile:File;
-private  var downloadUrl:String;
-
-[Bindable]
-public function get vpFolderPath():String
-{
-	return _vpFolderPath;
-}
-
-private function set vpFolderPath(value:String):void
-{
-	_vpFolderPath = value;
-	dldFolderPath = _vpFolderPath + File.separator + "dld";
-	dbFolderPath = _vpFolderPath + File.separator + "db";
-}
-// path to own videos folder
-private var _ownFolderPath:String;
-
-[Bindable]
-public function get ownFolderPath():String
-{
-	return _ownFolderPath;
-}
-
-private function set ownFolderPath(value:String):void
-{
-	_ownFolderPath = value;
-}
+private var urlStream:URLStream;
+private var fileStream:FileStream;
+private var _updateUrl:String;
+private var updateFile:File;
+private var downloadUrl:String;
+private var session:Session = Session.getInstance();
 
 protected function vpDude_creationCompleteHandler(event:FlexEvent):void
 {	
@@ -115,39 +70,7 @@ protected function vpDude_creationCompleteHandler(event:FlexEvent):void
 	Util.ffMpegOutputLog( "Start", true );
 	Util.cacheLog( "Start", true );
 	Util.convertLog( "Start", true );
-	urlMonitor( vpRootUrl );
-	checkFFMpeg();
-
-}
-
-private function checkFFMpeg():void
-{
-	// determine OS to download right ffmpeg
-	os = Capabilities.os.substr(0, 3);
-	if (os == "Win") 
-	{
-		vpFFMpeg = "ffmpeg.exe";
-	} 
-	else if (os == "Mac") 
-	{
-		vpFFMpeg = "ffmpeg.dat";
-	} 
-	else 
-	{
-		vpFFMpeg = "ffmpeg.lame"; 
-	}
-	var FFMpegAppFile:File = File.applicationDirectory.resolvePath( 'ffmpeg' + File.separator + vpFFMpeg );
-	if( FFMpegAppFile.exists )
-	{
-		Util.log( "FFMpegAppFile exists: " + FFMpegAppFile.nativePath );
-	} 
-	else 
-	{
-		Util.log( "FFMpegAppFile does not exist: " + FFMpegAppFile.nativePath );
-	}
-	vpFFMpegExePath = FFMpegAppFile.nativePath;
-	
-
+	urlMonitor( session.vpRootUrl );
 }
 
 public function addTabs():void 
@@ -170,11 +93,9 @@ public function addTabs():void
 		tabNav.addChild( new Quit() );	
 		// load tagsFile when config is done
 		var tags:Tags = Tags.getInstance();
-		tags.dbPath = dbFolderPath;
 		tags.loadTagsFile();
 		// load clipsFile when config is done
 		var clips:Clips = Clips.getInstance();
-		clips.dbPath = dbFolderPath;
 		clips.loadClipsFile();
 	}
 }
@@ -182,12 +103,12 @@ private function onMonitor(event:StatusEvent):void
 {
 	if ( monitor )
 	{
-		connected = monitor.available;
-		statusText.text = vpRootUrl +  ( connected ? " is available" : " could not be reached" );
+		session.connected = monitor.available;
+		statusText.text = session.vpRootUrl +  ( session.connected ? " is available" : " could not be reached" );
 		Util.log( statusText.text );
 		
 		trace( tabNav.numChildren );	
-		if ( connected ) 
+		if ( session.connected ) 
 		{
 			if ( tabNav.numChildren == 5 )
 			{
@@ -287,19 +208,6 @@ private function urlMonitor(url:String):void
 	monitor.pollInterval = 10000;
 }
 
-/*public function errorEventErrorHandler(event:ErrorEvent):void
-{
-	Util.log( 'An ErrorEvent has occured: ' + event.text );
-}    
-public function ioErrorHandler( event:IOErrorEvent ):void
-{
-	Util.log( 'An IO Error has occured: ' + event.text );
-}    
-// only called if a security error detected by flash player such as a sandbox violation
-public function securityErrorHandler( event:SecurityErrorEvent ):void
-{
-	Util.log( "securityErrorHandler: " + event.text );
-}		*/
 //  after a file upload is complete or attemted the server will return an http status code, code 200 means all is good anything else is bad.
 public function httpStatusHandler( event:HTTPStatusEvent ):void 
 {  
@@ -316,7 +224,7 @@ protected function isNewerFunction(currentVersion:String, updateVersion:String):
 
 protected function updater_errorHandler(event:ErrorEvent):void
 {
-	Alert.show(event.text);
+	Util.errorLog( event.text );
 }
 
 protected function updater_initializedHandler(event:UpdateEvent):void
@@ -375,5 +283,5 @@ private function updater_downloadCompleteHandler(event:UpdateEvent):void
 
 private function updater_downloadErrorHandler(event:DownloadErrorEvent):void
 {
-	Alert.show("Error downloading update file, try again later.");
+	Util.errorLog("Error downloading update file.");
 }

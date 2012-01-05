@@ -5,6 +5,7 @@ import components.Config;
 import components.Search;
 import components.TagEdit;
 
+import flash.desktop.NativeDragManager;
 import flash.display.BitmapData;
 import flash.display.Graphics;
 import flash.display.Loader;
@@ -65,6 +66,7 @@ private var previewWaitImage:Class;
 private var previewNotAvailableImage:Class;
 
 private var cache:CacheManager;
+private var session:Session = Session.getInstance();
 
 override public function set data( value:Object ) : void {
 	super.data = value;
@@ -74,7 +76,7 @@ override public function set data( value:Object ) : void {
 		{	
 			//don't load from cache as it is local files
 			if ( data.urlthumb1 ) cachedThumbnail1 = data.urlthumb1;
-			if ( FlexGlobals.topLevelApplication.os == "Mac" )
+			if ( session.os == "Mac" )
 			{
 				cachedThumbnail1 = "file://" + cachedThumbnail1;
 			}
@@ -95,7 +97,7 @@ override public function set data( value:Object ) : void {
 				imgUrl.source = cachedThumbnail1;
 			}
 			
-			if ( data.@urllocal ) cachedVideo = FlexGlobals.topLevelApplication.ownFolderPath + File.separator + data.@urllocal;
+			if ( data.@urllocal ) cachedVideo = session.ownFolderPath + File.separator + data.@urllocal;
 		}
 		else
 		{	
@@ -151,7 +153,7 @@ private function allFilesDownloaded(evt:Event):void
 }
 private function checkLocalCache( t:String, c:String, v:String ):void
 {
-	if ( !cache ) cache = new CacheManager( parentDocument.dldFolderPath );
+	if ( !cache ) cache = new CacheManager( session.dldFolderPath );
 	var sCacheFile:File = new File( cachedSwf );
 	Util.cacheLog( "ClipItem, checkLocalCache swf localUrl: " + cachedSwf );
 	var allDldOk:Boolean = true;
@@ -182,27 +184,27 @@ private function loadComplete(event:Event):void
 }
 private function getCachedVideo( videoUrl:String ):String
 {
-	if ( !cache ) cache = new CacheManager( FlexGlobals.topLevelApplication.dldFolderPath );
+	if ( !cache ) cache = new CacheManager( session.dldFolderPath );
 	var cachedVideoUrl:String = cache.getClipByURL( videoUrl );
 	return cachedVideoUrl;
 }
 private function getCachedSwf( swfUrl:String ):String
 {
-	if ( !cache ) cache = new CacheManager( FlexGlobals.topLevelApplication.dldFolderPath );
-	var cachedSwfUrl:String	= cache.getSwfByURL( swfUrl, (FlexGlobals.topLevelApplication.os == "Mac") );
+	if ( !cache ) cache = new CacheManager( session.dldFolderPath );
+	var cachedSwfUrl:String	= cache.getSwfByURL( swfUrl, (session.os == "Mac") );
 	Util.log( "getCachedSwf, cachedSwfUrl: " + cachedSwfUrl );
 	return cachedSwfUrl;
 }
 private function getCachedThumbnail( thumbnailUrl:String ):String
 {
-	if ( !cache ) cache = new CacheManager( FlexGlobals.topLevelApplication.dldFolderPath );
+	if ( !cache ) cache = new CacheManager( session.dldFolderPath );
 	var cachedThumbUrl:String = cache.getThumbnailByURL( thumbnailUrl );
 	return cachedThumbUrl;
 }
 protected function viewOnline_clickHandler(event:MouseEvent):void
 {
-	FlexGlobals.topLevelApplication.vpFullUrl = "http://www.videopong.net/clip/detail/" + data.@id;
-	if (FlexGlobals.topLevelApplication.connected) FlexGlobals.topLevelApplication.tabNav.selectedIndex=1;
+	session.vpFullUrl = "http://www.videopong.net/clip/detail/" + data.@id;
+	if (session.connected) FlexGlobals.topLevelApplication.tabNav.selectedIndex=1;
 }
 protected function viewFolder_clickHandler(event:MouseEvent):void
 {
@@ -212,8 +214,8 @@ protected function viewFolder_clickHandler(event:MouseEvent):void
 
 protected function creator_clickHandler(event:MouseEvent):void
 {
-	FlexGlobals.topLevelApplication.vpFullUrl = "http://www.videopong.net/user/"+ data.creator.@id + "/" + data.creator.@name;
-	if (FlexGlobals.topLevelApplication.connected) FlexGlobals.topLevelApplication.tabNav.selectedIndex=1;
+	session.vpFullUrl = "http://www.videopong.net/user/"+ data.creator.@id + "/" + data.creator.@name;
+	if (session.connected) FlexGlobals.topLevelApplication.tabNav.selectedIndex=1;
 }
 protected function rateClip_clickHandler(event:MouseEvent):void
 {
@@ -231,7 +233,7 @@ protected function updateDetails():void
 		if (searchComp.viewCreatorBtn.hasEventListener( MouseEvent.CLICK ) )
 			searchComp.viewCreatorBtn.removeEventListener( MouseEvent.CLICK, creator_clickHandler );
 		
-		if ( FlexGlobals.topLevelApplication.userName != data.creator.@name)
+		if ( session.userName != data.creator.@name)
 		{
 			searchComp.viewClipBtn.addEventListener( MouseEvent.CLICK, viewOnline_clickHandler );
 			searchComp.viewCreatorBtn.label = "created by: " + data.creator.@name;
@@ -301,7 +303,7 @@ protected function updateDetails():void
 		
 		if ( data.attribute( "urllocal" ).length() > 0 ) 
 		{	
-			searchComp.localUrl.text = FlexGlobals.topLevelApplication.ownFolderPath + File.separator + data.attribute( "urllocal" );
+			searchComp.localUrl.text = session.ownFolderPath + File.separator + data.attribute( "urllocal" );
 		}
 		else
 		{
