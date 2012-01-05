@@ -165,7 +165,7 @@ package fr.batchass
 			
 			if ( fileName.length < 1 )
 			{
-				//all characters removed
+				//all characters removed 
 				fileName = getFileName( url );
 				lastDot = fileName.lastIndexOf( '.' );
 				if ( lastDot > -1 ) fileName = fileName.substr( 0, lastDot );

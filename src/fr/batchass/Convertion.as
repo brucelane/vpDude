@@ -93,6 +93,14 @@ package fr.batchass
 					if ( !startFFMpegProcess.running ) 
 					{
 						Util.convertLog( "processConvert, startFFMpegProcess not running, busy becomes false" );
+						
+						if ( fileToConvert.length > 0 ) 
+						{
+							countDone++;
+							fileToConvert.shift();
+							Util.convertLog( "processConvert, fileToConvert.shift" );
+							Util.convertLog( "processConvert, fileToConvert.length:" + fileToConvert.length );
+						}
 						busy = false;
 					}
 				}
@@ -125,7 +133,7 @@ package fr.batchass
 				newFiles += clip.clipGeneratedTitle + " ";
 
 				fileToConvert.push( clip );
-				Util.convertLog( "addFileToConvert, new clip:" + clip.clipGeneratedTitle );
+				Util.convertLog( "addFileToConvert, new clip:" + clip.clipPath );
 				Util.convertLog( "addFileToConvert, fileToConvert.length:" + fileToConvert.length );
 			}
 			else
@@ -151,7 +159,7 @@ package fr.batchass
 					clips.deleteClip( clip.clipGeneratedName, clip.clipRelativePath );
 					// generate new files
 					fileToConvert.push( clip ); 
-					Util.convertLog( "addFileToConvert, changed clip:" + clip.clipGeneratedTitle );
+					Util.convertLog( "addFileToConvert, changed clip:" + clip.clipPath );
 					Util.convertLog( "addFileToConvert, fileToConvert.length:" + fileToConvert.length );
 					countChanged++;
 					countDone++;
@@ -168,7 +176,7 @@ package fr.batchass
 		private function onThumb1ConvertComplete(clip:Clip):void
 		{
 			progress += "Thumb1 convertion completed:" + clip.clipGeneratedTitle + "\n";
-			Util.convertLog( "onThumb1ConvertComplete, ThumbConvert Completed:" + clip.clipGeneratedTitle );
+			Util.convertLog( "onThumb1ConvertComplete, ThumbConvert Completed:" + clip.clipPath );
 			Util.convertLog( "onThumb1ConvertComplete, fileToConvert.length:" + fileToConvert.length );
 			frame = 0;
 			generate( clip, false );
@@ -176,21 +184,21 @@ package fr.batchass
 		private function onThumb2ConvertComplete(clip:Clip):void
 		{
 			progress += "Thumb2 convertion completed:" + clip.clipGeneratedTitle + "\n";
-			Util.convertLog( "onThumb2ConvertComplete, ThumbConvert Completed:" + clip.clipGeneratedTitle );
+			Util.convertLog( "onThumb2ConvertComplete, ThumbConvert Completed:" + clip.clipPath );
 			Util.convertLog( "onThumb2ConvertComplete, fileToConvert.length:" + fileToConvert.length );
 			frame = 0;		
 		}
 		private function onThumb3ConvertComplete(clip:Clip):void
 		{
 			progress += "Thumb3 convertion completed:" + clip.clipGeneratedTitle + "\n";
-			Util.convertLog( "onThumb3ConvertComplete, ThumbConvert Completed:" + clip.clipGeneratedTitle );
+			Util.convertLog( "onThumb3ConvertComplete, ThumbConvert Completed:" + clip.clipPath );
 			Util.convertLog( "onThumb3ConvertComplete, fileToConvert.length:" + fileToConvert.length );
 			frame = 0;
 		}
 		private function onMovieConvertComplete(clip:Clip):void
 		{
 			progress += "Movie convertion completed:" + clip.clipGeneratedTitle + "\n";
-			Util.convertLog( "onMovieConvertComplete, MovieConvert Completed:" + clip.clipGeneratedTitle );
+			Util.convertLog( "onMovieConvertComplete, MovieConvert Completed:" + clip.clipPath );
 			Util.convertLog( "onMovieConvertComplete, fileToConvert.length:" + fileToConvert.length );
 			if ( maxFrame > 0 )
 			{
@@ -602,7 +610,7 @@ package fr.batchass
 						if ( thumb ) 
 						{
 							progress += "Thumb " + thumbIndex + " (frame " + thumbNumber + ") convertion started:" + clip.clipGeneratedTitle + "\n";
-							Util.convertLog( "Thumb " + thumbIndex + " (frame " + thumbNumber + ") convertion started:" + clip.clipGeneratedTitle );
+							Util.convertLog( "Thumb " + thumbIndex + " (frame " + thumbNumber + ") convertion started:" + clip.clipPath );
 							if ( thumbIndex == 1 ) startFFMpegProcess.addEventListener(ProgressEvent.STANDARD_ERROR_DATA, errorThumb1DataHandler);					
 							if ( thumbIndex == 2 ) startFFMpegProcess.addEventListener(ProgressEvent.STANDARD_ERROR_DATA, errorThumb2DataHandler);					
 							if ( thumbIndex == 3 ) startFFMpegProcess.addEventListener(ProgressEvent.STANDARD_ERROR_DATA, errorThumb3DataHandler);					
@@ -610,7 +618,7 @@ package fr.batchass
 						else
 						{
 							progress += "Movie convertion started:" + clip.clipGeneratedTitle + "\n";
-							Util.convertLog( "Movie convertion started:" + clip.clipGeneratedTitle );
+							Util.convertLog( "Movie convertion started:" + clip.clipPath );
 							startFFMpegProcess.addEventListener(ProgressEvent.STANDARD_ERROR_DATA, errorMovieDataHandler);						
 						}
 						startFFMpegProcess.addEventListener(Event.STANDARD_OUTPUT_CLOSE, processClose );
