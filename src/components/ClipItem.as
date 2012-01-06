@@ -6,6 +6,7 @@ import components.Search;
 import components.TagEdit;
 
 import flash.desktop.NativeDragManager;
+import flash.display.Bitmap;
 import flash.display.BitmapData;
 import flash.display.Graphics;
 import flash.display.Loader;
@@ -36,6 +37,10 @@ import videopong.*;
 
 [Bindable]
 private var cachedThumbnail1:String;
+[Bindable]
+private var cachedThumbnail2:String;
+[Bindable]
+private var cachedThumbnail3:String;
 [Bindable]
 private var clipname:String;
 
@@ -76,10 +81,18 @@ override public function set data( value:Object ) : void {
 		{	
 			//don't load from cache as it is local files
 			if ( data.urlthumb1 ) cachedThumbnail1 = data.urlthumb1;
+			if ( data.urlthumb2 ) cachedThumbnail2 = data.urlthumb2;
+			if ( data.urlthumb3 ) cachedThumbnail3 = data.urlthumb3;
 			if ( session.os == "Mac" )
 			{
 				cachedThumbnail1 = "file://" + cachedThumbnail1;
+				cachedThumbnail2 = "file://" + cachedThumbnail2;
+				cachedThumbnail3 = "file://" + cachedThumbnail3;
 			}
+			// if convertion needed
+			var cnv:Convertion = Convertion.getInstance(); 
+			var pathToVideo:String = session.ownFolderPath + File.separator + data.@urllocal;
+			var VideoFile:File = new File( pathToVideo );
 			
 			var thumb1:File = new File( cachedThumbnail1 );
 			if ( !thumb1.exists ) 
@@ -95,6 +108,18 @@ override public function set data( value:Object ) : void {
 				loader.contentLoaderInfo.addEventListener( IOErrorEvent.IO_ERROR, ioErrorHandler );
 				loader.load( req );
 				imgUrl.source = cachedThumbnail1;
+			}
+			var thumb2:File = new File( cachedThumbnail2 );
+			if ( !thumb2.exists ) 
+			{
+				Util.errorLog( cachedThumbnail2 + " does not exist" );
+				
+				cnv.createThumb( VideoFile, 2 );	
+			}
+			var thumb3:File = new File( cachedThumbnail3 );
+			if ( !thumb3.exists ) 
+			{
+				Util.errorLog( cachedThumbnail3 + " does not exist" );
 			}
 			
 			if ( data.@urllocal ) cachedVideo = session.ownFolderPath + File.separator + data.@urllocal;
@@ -124,18 +149,14 @@ override public function set data( value:Object ) : void {
 
 		data.clip.@name ? clipname = data.clip.@name : "...";
 		
-		//tagsXMLList = new XMLListCollection(data..tags.tag.@name);
 		clipXmlTagList = data..tags.tag as XMLList;
 		var tagString:String = "";	
-		//searchComp.tagAutoComplete.dataProvider = tags.tagsXMLList;
 
 		for each ( var oneTag:XML in clipXmlTagList )
 		{
 			if ( tagString.length > 0 ) tagString += ",";
 			tagString += oneTag.@name;
 		}
-		//tagList = tagString;
-		
 	}
 }
 private function allFilesDownloaded(evt:Event):void
