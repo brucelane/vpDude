@@ -180,14 +180,14 @@ package fr.batchass
 			progress += "Thumb1 convertion completed:" + clip.clipGeneratedTitle + "\n";
 			Util.convertLog( "onThumb1ConvertComplete, ThumbConvert Completed:" + clip.clipPath );
 			Util.convertLog( "onThumb1ConvertComplete, fileToConvert.length:" + fileToConvert.length );
-			generate( clip, true, 2, Math.min( clip.maxFrame , 24 ) );
+			generate( clip, true, 2, Math.min( clip.maxFrame , 2400 ) );
 		}
 		private function onThumb2ConvertComplete(clip:Clip):void
 		{
 			progress += "Thumb2 convertion completed:" + clip.clipGeneratedTitle + "\n";
 			Util.convertLog( "onThumb2ConvertComplete, ThumbConvert Completed:" + clip.clipPath );
 			Util.convertLog( "onThumb2ConvertComplete, fileToConvert.length:" + fileToConvert.length );
-			generate( clip, true, 3,  Math.min( clip.maxFrame , 36 ) );	
+			generate( clip, true, 3,  Math.min( clip.maxFrame , 3600 ) );	
 		}
 		private function onThumb3ConvertComplete(clip:Clip):void
 		{
@@ -203,7 +203,7 @@ package fr.batchass
 			if ( clip.maxFrame > 0 )
 			{
 				Util.convertLog( "onMovieConvertComplete, clip.maxFrame:" + clip.maxFrame );
-				generate( clip, true, 1, Math.min( clip.maxFrame , 12 ) );
+				generate( clip, true, 1, Math.min( clip.maxFrame , 1200 ) );
 			}
 			else
 			{
@@ -459,9 +459,9 @@ package fr.batchass
 		public function createThumb( VideoFile:File, thumbIndex:int ):void
 		{
 			var clip:Clip = new Clip( VideoFile );
-			generate( clip, true, thumbIndex, thumbIndex )
+			generate( clip, true, thumbIndex, thumbIndex * 800, false );
 		}
-		public function generate( clip:Clip, thumb:Boolean, thumbIndex:int = 1, thumbNumber:int = 10 ):void
+		public function generate( clip:Clip, thumb:Boolean, thumbIndex:int = 1, thumbNumber:int = 10, addListener:Boolean = true ):void
 		{
 			var outPath:String;
 			var outFile:String;
@@ -571,9 +571,12 @@ package fr.batchass
 						{
 							progress += "Thumb " + thumbIndex + " (frame " + thumbNumber + ") convertion started:" + clip.clipGeneratedTitle + "\n";
 							Util.convertLog( "Thumb " + thumbIndex + " (frame " + thumbNumber + ") convertion started:" + clip.clipPath );
-							if ( thumbIndex == 1 ) startFFMpegProcess.addEventListener(ProgressEvent.STANDARD_ERROR_DATA, errorThumb1DataHandler);					
-							if ( thumbIndex == 2 ) startFFMpegProcess.addEventListener(ProgressEvent.STANDARD_ERROR_DATA, errorThumb2DataHandler);					
-							if ( thumbIndex == 3 ) startFFMpegProcess.addEventListener(ProgressEvent.STANDARD_ERROR_DATA, errorThumb3DataHandler);					
+							if ( addListener )
+							{
+								if ( thumbIndex == 1 ) startFFMpegProcess.addEventListener(ProgressEvent.STANDARD_ERROR_DATA, errorThumb1DataHandler);					
+								if ( thumbIndex == 2 ) startFFMpegProcess.addEventListener(ProgressEvent.STANDARD_ERROR_DATA, errorThumb2DataHandler);					
+								if ( thumbIndex == 3 ) startFFMpegProcess.addEventListener(ProgressEvent.STANDARD_ERROR_DATA, errorThumb3DataHandler);									
+							}
 						}
 						else
 						{

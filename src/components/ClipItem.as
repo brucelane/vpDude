@@ -63,11 +63,11 @@ private var searchComp:Search;
 private var ac:ArrayCollection;
 //private var tagArray:Array = [];
 private const minFileSize:int = 10000;
-[Embed(source='../assets/wait.png')]
+[Embed(source='images/wait.png')]
 private var waitImage:Class;
-[Embed(source='../assets/previewwait.png')]
+[Embed(source='images/previewwait.png')]
 private var previewWaitImage:Class;
-[Embed(source='../assets/nopreview.png')]
+[Embed(source='images/nopreview.png')]
 private var previewNotAvailableImage:Class;
 
 private var cache:CacheManager;
@@ -99,6 +99,7 @@ override public function set data( value:Object ) : void {
 			{
 				imgUrl.source = waitImage;
 				Util.errorLog( cachedThumbnail1 + " does not exist" );
+				cnv.createThumb( VideoFile, 1 );	
 			}
 			else
 			{
@@ -113,13 +114,28 @@ override public function set data( value:Object ) : void {
 			if ( !thumb2.exists ) 
 			{
 				Util.errorLog( cachedThumbnail2 + " does not exist" );
+				cnv.createThumb( VideoFile, 2 );
 				
-				cnv.createThumb( VideoFile, 2 );	
+				var t2:File = File.applicationDirectory.resolvePath( 'images' + File.separator + 'thumbnotavailable.png' );
+				if( t2.exists )
+				{
+					Util.log( "t2 exists: " + t2.nativePath );
+					cachedThumbnail2 = t2.nativePath;
+				} 				 
 			}
 			var thumb3:File = new File( cachedThumbnail3 );
 			if ( !thumb3.exists ) 
 			{
 				Util.errorLog( cachedThumbnail3 + " does not exist" );
+				cnv.createThumb( VideoFile, 3 );
+				
+				var t3:File = File.applicationDirectory.resolvePath( 'images' + File.separator + 'thumbnotavailable.png' );
+				if( t3.exists )
+				{
+					Util.log( "t3 exists: " + t3.nativePath );
+					cachedThumbnail3 = t3.nativePath;
+				} 
+
 			}
 			
 			if ( data.@urllocal ) cachedVideo = session.ownFolderPath + File.separator + data.@urllocal;
