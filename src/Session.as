@@ -6,6 +6,7 @@ package
 	import fr.batchass.Util;
 	import flash.events.Event;
 
+	[Bindable]
 	public class Session
 	{
 		private static var instance:Session = new Session();

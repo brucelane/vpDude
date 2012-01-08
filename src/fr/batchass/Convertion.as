@@ -17,6 +17,7 @@ package fr.batchass
 	import videopong.Clips;
 	import videopong.Tags;
 	
+	[Bindable]
 	public class Convertion implements IEventDispatcher
 	{
 		private var dispatcher:EventDispatcher;

@@ -13,6 +13,7 @@ import videopong.*;
 private var airApp : Object = this;
 private var cache:CacheManager;
 private var timer:Timer;
+[Bindable]
 private var session:Session = Session.getInstance();
 /*[Bindable]
 private var vpFullUrl:String = "";*/
