@@ -63,9 +63,9 @@ private var passwordChanged:Boolean = false;
 public static var CONFIG_XML:XML;
 private var validExtensions:Array = ["avi", "mov", "mp4", "flv", "qt", "swf", "mpeg", "mpg", "h264"];
 
-
-
+[Bindable]
 private var cnv:Convertion = Convertion.getInstance(); 
+[Bindable]
 private var session:Session = Session.getInstance();
 
 protected function config_preinitializeHandler(event:FlexEvent):void
