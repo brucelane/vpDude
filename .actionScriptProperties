@@ -29,6 +29,7 @@
     <buildTarget buildTargetName="default">
       <airSettings airCertificatePath="C:/Users/Bruce/Documents/projects/workspace/vpDude/certificate/vpDude.p12" airTimestamp="true" version="1">
         <airExcludes>
+          <pathEntry path="images/Thumbs.db"/>
           <pathEntry path="ffmpeg/ffmpeg.dat"/>
           <pathEntry path="images/previewnotavailable.png"/>
           <pathEntry path="ffmpeg/ffmpeg.lame"/>

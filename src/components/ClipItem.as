@@ -119,7 +119,7 @@ override public function set data( value:Object ) : void {
 				var t2:File = File.applicationDirectory.resolvePath( 'images' + File.separator + 'thumbnotavailable.png' );
 				if( t2.exists )
 				{
-					Util.log( "t2 exists: " + t2.nativePath );
+					//Util.log( "t2 exists: " + t2.nativePath );
 					cachedThumbnail2 = t2.nativePath;
 				} 				 
 			}
@@ -132,7 +132,7 @@ override public function set data( value:Object ) : void {
 				var t3:File = File.applicationDirectory.resolvePath( 'images' + File.separator + 'thumbnotavailable.png' );
 				if( t3.exists )
 				{
-					Util.log( "t3 exists: " + t3.nativePath );
+					//Util.log( "t3 exists: " + t3.nativePath );
 					cachedThumbnail3 = t3.nativePath;
 				} 
 

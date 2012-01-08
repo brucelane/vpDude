@@ -25,7 +25,7 @@ private function timerFct(event:Event):void
 {
 	applyLabel.text = "";
 	timer.stop();
-
+	tags.resyncTags();
 }
 private function handleButtonClick():void
 {
@@ -89,6 +89,7 @@ protected function tabSearchApplyBtn_clickHandler(event:MouseEvent):void
 			//test if tag is not already in clip
 			clips.addTagIfNew( oneTag.toLowerCase(), tagAutoComplete.data.@id, false );//resets search view!!!
 		}
+		// remove applyLabel message and resyncTags
 		timer.start();
 	}
 }	

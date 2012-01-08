@@ -25,7 +25,6 @@ package fr.batchass
 		private var timer:Timer;
 		public var fileToConvert:Array = new Array();
 		private var startFFMpegProcess:NativeProcess;
-		[Bindable]		
 		public var currentFilename:String = "";
 		private var currentThumb:int;
 		private var thumb1:String;
@@ -35,21 +34,13 @@ package fr.batchass
 		private var _summary:String = "";
 		private var _progress:String = "";
 		
-		[Bindable]
 		public var countNew:int = 0;
-		[Bindable]
 		public var countDeleted:int = 0;
-		[Bindable]
 		public var countChanged:int = 0;
-		[Bindable]
 		public var countDone:int = 0;
-		[Bindable]
 		public var countError:int = 0;
-		[Bindable]
 		public var countTotal:int = 0;
-		[Bindable]
 		public var frame:int = 0;
-		[Bindable]
 		public var countNoChange:int = 0;
 		public var nochgFiles:String = "";
 		public var newFiles:String = "";
@@ -57,7 +48,6 @@ package fr.batchass
 		public var chgFiles:String = "";
 		public var errFiles:String = "";
 		public var allFiles:String = "";
-		[Bindable]
 		public var reso:String = "320x240";
 		private var OWN_CLIPS_XML:XML;
 		private var session:Session = Session.getInstance();
@@ -100,7 +90,7 @@ package fr.batchass
 							
 							if ( fileToConvert.length > 0 ) 
 							{
-								countDone++;
+								//countDone++;
 								writeOwnXml( fileToConvert[0] );
 							}
 							//TODO validate busy = false;
