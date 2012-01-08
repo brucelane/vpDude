@@ -4,6 +4,7 @@ import flash.events.*;
 import flash.filesystem.File;
 import flash.net.URLRequest;
 import flash.net.navigateToURL;
+import flash.utils.Timer;
 
 import flashx.textLayout.events.StatusChangeEvent;
 
@@ -67,6 +68,8 @@ private var validExtensions:Array = ["avi", "mov", "mp4", "flv", "qt", "swf", "m
 private var cnv:Convertion = Convertion.getInstance(); 
 [Bindable]
 private var session:Session = Session.getInstance();
+
+private var timer:Timer;
 
 protected function config_preinitializeHandler(event:FlexEvent):void
 {
@@ -141,6 +144,8 @@ protected function config_creationCompleteHandler(event:FlexEvent):void
 	cnv.addEventListener( Event.CHANGE, statusChange );
 	cnv.addEventListener( Event.ADDED, frameChange );
 	cnv.addEventListener( Event.CONNECT, progressChange );
+	timer = new Timer(1000);
+	timer.addEventListener(TimerEvent.TIMER, browseAndConvert);
 
 }
 protected function pwdTextInput_focusInHandler(event:FocusEvent):void
@@ -314,9 +319,10 @@ private function progressChange(event:Event):void
 	progress = cnv.progress;
 }
 
-protected function browseAndConvert():void
+protected function browseAndConvert(event:TimerEvent):void
 {
 	Util.errorLog("browseAndConvert start");
+	timer.stop();
 	cnv = Convertion.getInstance(); 
 	cnv.addEventListener( Event.COMPLETE, resyncComplete );
 	cnv.addEventListener( Event.CHANGE, statusChange );
@@ -339,6 +345,7 @@ protected function browseAndConvert():void
 	
 	parentDocument.statusText.text = "Found " + ownFiles.length + " file(s)";
 	// delete inexistent files from db
+	Util.errorLog("delete inexistent files from db");
 	var clips:Clips = Clips.getInstance();
 	var clipList:XMLList = clips.CLIPS_XML..video as XMLList;
 	for each ( var clip:XML in clipList )
@@ -350,22 +357,12 @@ protected function browseAndConvert():void
 			// search for file is own folder
 			if ( !searchedFile.exists ) 
 			{
+				Util.errorLog("delete:" + session.dbFolderPath + File.separator + clip.@id + ".xml");
 				// delete xml file
 				cnv.deleteFile( session.dbFolderPath + File.separator + clip.@id + ".xml" );
 				// delete in clips.xml
 				clips.deleteClip( clip.@id, clip.@urllocal );
-				/*var clipId:String = clip.@id;
-				//delete tag in tags.xml
-				var clipTagList:XMLList = clip..tag as XMLList;
-				var tags:Tags = Tags.getInstance();
-				for each ( var clipTag:XML in clipTagList )
-				{
-					if ( clipId.indexOf( clipTag.@name ) > -1 )
-					{
-						tags.deleteTag( clipTag.@name );												
-					}
-				}
-				*/				
+			
 				// delete thumbs
 				cnv.deleteFile( clip.urlthumb1 );
 				cnv.deleteFile( clip.urlthumb2 );
@@ -397,12 +394,14 @@ protected function resyncBtn_clickHandler(event:MouseEvent):void
 	resyncBtn.validateNow();
 	Util.errorLog("resyncBtn validateNow");
 	Util.errorLog("resyncBtn.label:" + resyncBtn.label);
-	this.callLater( browseAndConvert );
-
+	//this.callLater( browseAndConvert );
+	timer.start();
 }
+
 // Process all files in a directory structure including subdirectories.
 public function processAllFiles( selectedDir:File ):void
 {
+	Util.errorLog("processAllFiles:" + selectedDir.nativePath);
 	var clips:Clips = Clips.getInstance();
 	for each( var lstFile:File in selectedDir.getDirectoryListing() )
 	{

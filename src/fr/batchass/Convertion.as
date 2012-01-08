@@ -405,6 +405,8 @@ package fr.batchass
 		}
 		public function start():void
 		{
+			Util.errorLog("cnv.start called");
+
 			frame = 0;
 			countNew = 0;
 			countDeleted = 0;
@@ -613,18 +615,14 @@ package fr.batchass
 			//configComp.log.text += data;
 			Util.ffMpegOutputLog( "NativeProcess outputDataHandler: " + data );
 		}
-		
-		[Bindable]
 		public function get summary():String
 		{
 			return _summary;
 		}
-		
 		public function set summary(value:String):void
 		{
 			_summary = value;
 		}
-		[Bindable]
 		public function get progress():String
 		{
 			return _progress;

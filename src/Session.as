@@ -79,7 +79,6 @@ package
 			_userName = value;
 		}
 
-		[Bindable]
 		public function get vpFolderPath():String
 		{
 			return _vpFolderPath;
@@ -92,7 +91,6 @@ package
 			dbFolderPath = _vpFolderPath + File.separator + "db";
 		}
 		
-		[Bindable]
 		public function get ownFolderPath():String
 		{
 			return _ownFolderPath;

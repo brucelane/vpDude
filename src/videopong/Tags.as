@@ -79,7 +79,7 @@ package videopong
 			arrayToSort.sortOn( "name" );
 			TAGS_XML =  <tags>
 						</tags>;
-			for each ( var arrayItem in arrayToSort )
+			for each ( var arrayItem:Object in arrayToSort )
 			{
 				TAGS_XML.appendChild( <tag name={arrayItem.name} creationdate={arrayItem.creationdate} /> );
 			}					
