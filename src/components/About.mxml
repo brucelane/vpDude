@@ -38,7 +38,8 @@
 				"<br />" +
 				"vpDude includes or uses: <br />" +
 				" - <a href='http://ffmpeg.org/'>ffmpeg</a> that is published under <a href='http://www.gnu.org/licenses/old-licenses/gpl-2.0.html'>GNU General Public License (GPL) version 2</a> or later<br />" +
-				" - autocomplete from <a href='http://hillelcoren.com'>Hillel Coren</a> <br />"
+				" - autocomplete from <a href='http://hillelcoren.com'>Hillel Coren</a> <br />" +
+				" - nativeautoupdate from <a href='http://www.riaspace.com'>Piotr Walczyszyn</a> <br />" +
 				"<br />";
 
 			}

@@ -41,11 +41,12 @@
 			<components:Quit/>
 		</mx:TabNavigator>
 		<s:HGroup verticalCenter="0" includeIn="updaterView" horizontalCenter="0" verticalAlign="top">
-			<!--<s:BitmapImage source="@Embed(source='/assets/icon128.png')" />-->
 			<s:VGroup width="100%" horizontalAlign="center">
 				<s:Label text="New version ({updater.updateVersion}) is available." />
 				<mx:ProgressBar id="prgBar" source="{updater}" label="Downloading %3%" visible="{downloading}" />
 				<s:Button id="btnNo" label="Cancel" click="btnNo_clickHandler(event)" />
+				<s:Button id="btnInstall" visible="false" label="Cancel" click="btnInstall_clickHandler(event)" />
+				<s:TextArea id="txtInstall" visible="false" text="If autoupdate fails, please deinstall your current version by hand and download the provided install package from videopong.net" />
 			</s:VGroup>
 		</s:HGroup>
 	</s:VGroup>

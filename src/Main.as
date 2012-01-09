@@ -277,11 +277,16 @@ protected function btnNo_clickHandler(event:MouseEvent):void
 
 private function updater_downloadCompleteHandler(event:UpdateEvent):void
 {
-	// When update is downloaded install it.
-	updater.installUpdate();
+	// When update is downloaded 
+	btnInstall.visible = true;
+	txtInstall.visible = true;
 }
 
 private function updater_downloadErrorHandler(event:DownloadErrorEvent):void
 {
 	Util.errorLog("Error downloading update file.");
+}
+protected function btnInstall_clickHandler(event:MouseEvent):void
+{
+	updater.installUpdate();
 }
