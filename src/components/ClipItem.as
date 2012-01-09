@@ -72,6 +72,7 @@ private var previewNotAvailableImage:Class;
 
 private var cache:CacheManager;
 private var session:Session = Session.getInstance();
+private var cnv:Convertion = Convertion.getInstance(); 
 
 override public function set data( value:Object ) : void {
 	super.data = value;
@@ -90,54 +91,71 @@ override public function set data( value:Object ) : void {
 				cachedThumbnail3 = "file://" + cachedThumbnail3;
 			}
 			// if convertion needed
-			var cnv:Convertion = Convertion.getInstance(); 
 			var pathToVideo:String = session.ownFolderPath + File.separator + data.@urllocal;
 			var VideoFile:File = new File( pathToVideo );
 			
-			var thumb1:File = new File( cachedThumbnail1 );
-			if ( !thumb1.exists ) 
+			if ( VideoFile.exists )
 			{
-				imgUrl.source = waitImage;
-				Util.errorLog( cachedThumbnail1 + " does not exist" );
-				cnv.createThumb( VideoFile, 1 );	
+				var thumb1:File = new File( cachedThumbnail1 );
+				if ( !thumb1.exists ) 
+				{
+					imgUrl.source = waitImage;
+					Util.errorLog( cachedThumbnail1 + " does not exist" );
+					cnv.createThumb( VideoFile, 1 );	
+				}
+				else
+				{
+					var req:URLRequest = new URLRequest( cachedThumbnail1 );
+					var loader:Loader = new Loader();
+					loader.contentLoaderInfo.addEventListener( Event.COMPLETE, loadComplete );
+					loader.contentLoaderInfo.addEventListener( IOErrorEvent.IO_ERROR, ioErrorHandler );
+					loader.load( req );
+					imgUrl.source = cachedThumbnail1;
+				}
+				var thumb2:File = new File( cachedThumbnail2 );
+				if ( !thumb2.exists ) 
+				{
+					Util.errorLog( cachedThumbnail2 + " does not exist" );
+					cnv.createThumb( VideoFile, 2 );
+					
+					var t2:File = File.applicationDirectory.resolvePath( 'images' + File.separator + 'thumbnotavailable.png' );
+					if( t2.exists )
+					{
+						cachedThumbnail2 = t2.nativePath;
+					} 				 
+				}
+				var thumb3:File = new File( cachedThumbnail3 );
+				if ( !thumb3.exists ) 
+				{
+					Util.errorLog( cachedThumbnail3 + " does not exist" );
+					cnv.createThumb( VideoFile, 3 );
+					
+					var t3:File = File.applicationDirectory.resolvePath( 'images' + File.separator + 'thumbnotavailable.png' );
+					if( t3.exists )
+					{
+						cachedThumbnail3 = t3.nativePath;
+					} 	
+				}			
 			}
 			else
-			{
-				var req:URLRequest = new URLRequest( cachedThumbnail1 );
-				var loader:Loader = new Loader();
-				loader.contentLoaderInfo.addEventListener( Event.COMPLETE, loadComplete );
-				loader.contentLoaderInfo.addEventListener( IOErrorEvent.IO_ERROR, ioErrorHandler );
-				loader.load( req );
-				imgUrl.source = cachedThumbnail1;
-			}
-			var thumb2:File = new File( cachedThumbnail2 );
-			if ( !thumb2.exists ) 
-			{
-				Util.errorLog( cachedThumbnail2 + " does not exist" );
-				cnv.createThumb( VideoFile, 2 );
-				
-				var t2:File = File.applicationDirectory.resolvePath( 'images' + File.separator + 'thumbnotavailable.png' );
-				if( t2.exists )
+			{	
+				//VideoFile path does not exist
+				Util.errorLog( pathToVideo + " path does not exist" );
+				imgUrl.source = waitImage;
+				var th2:File = File.applicationDirectory.resolvePath( 'images' + File.separator + 'thumbnotavailable.png' );
+				if( th2.exists )
 				{
-					//Util.log( "t2 exists: " + t2.nativePath );
-					cachedThumbnail2 = t2.nativePath;
+					cachedThumbnail2 = th2.nativePath;
 				} 				 
-			}
-			var thumb3:File = new File( cachedThumbnail3 );
-			if ( !thumb3.exists ) 
-			{
-				Util.errorLog( cachedThumbnail3 + " does not exist" );
-				cnv.createThumb( VideoFile, 3 );
-				
-				var t3:File = File.applicationDirectory.resolvePath( 'images' + File.separator + 'thumbnotavailable.png' );
-				if( t3.exists )
+				var th3:File = File.applicationDirectory.resolvePath( 'images' + File.separator + 'thumbnotavailable.png' );
+				if( th3.exists )
 				{
-					//Util.log( "t3 exists: " + t3.nativePath );
-					cachedThumbnail3 = t3.nativePath;
-				} 
-
+					cachedThumbnail3 = th3.nativePath;
+				} 	
+				//delete clip
+				cnv.deleteXmlClipAsync( XML( data ) );
+				
 			}
-			
 			if ( data.@urllocal ) cachedVideo = session.ownFolderPath + File.separator + data.@urllocal;
 		}
 		else

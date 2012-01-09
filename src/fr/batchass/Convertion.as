@@ -12,6 +12,7 @@ package fr.batchass
 	import fr.batchass.*;
 	
 	import mx.core.FlexGlobals;
+	import mx.core.RuntimeDPIProvider;
 	
 	import videopong.Clip;
 	import videopong.Clips;
@@ -23,7 +24,11 @@ package fr.batchass
 		private var dispatcher:EventDispatcher;
 		private static var instance:Convertion;
 		private var timer:Timer;
+		private var clipDeleteTimer:Timer;
 		public var fileToConvert:Array = new Array();
+		public var filesToDelete:Array = new Array();
+		public var foldersToDelete:Array = new Array();
+		public var clipsXmlToDelete:Array = new Array();
 		private var startFFMpegProcess:NativeProcess;
 		public var currentFilename:String = "";
 		private var currentThumb:int;
@@ -51,6 +56,7 @@ package fr.batchass
 		public var reso:String = "320x240";
 		private var OWN_CLIPS_XML:XML;
 		private var session:Session = Session.getInstance();
+		private var clips:Clips = Clips.getInstance();
 		
 		public function Convertion()
 		{
@@ -58,6 +64,8 @@ package fr.batchass
 			dispatcher = new EventDispatcher(this);
 			timer = new Timer(1000);
 			timer.addEventListener(TimerEvent.TIMER, processConvert);
+			clipDeleteTimer = new Timer(1000);
+			clipDeleteTimer.addEventListener(TimerEvent.TIMER, deleteClips);
 		}
 
 		private function processConvert(event:Event): void 
@@ -119,7 +127,6 @@ package fr.batchass
 			var clip:Clip = new Clip( lstFile );
 			allFiles += clip.name + " ";
 			
-			var clips:Clips = Clips.getInstance();
 			if ( clips.newClip( clip.clipRelativePath ) )
 			{
 				countNew++;
@@ -149,7 +156,7 @@ package fr.batchass
 					clips.writeClipXmlFile( clip.clipGeneratedName, clipXml );					
 					
 					// modify clips.xml
-					clips.deleteClip( clip.clipGeneratedName, clip.clipRelativePath );
+					clips.deleteClip( clip.clipGeneratedName );
 					// generate new files
 					fileToConvert.push( clip ); 
 					Util.convertLog( "addFileToConvert, changed clip:" + clip.clipPath );
@@ -234,7 +241,6 @@ package fr.batchass
 				}
 			}
 			// we now create clip XML when thumb and swf are successfully generated
-			var clips:Clips = Clips.getInstance();
 			clips.addNewClip( clip.clipGeneratedName, OWN_CLIPS_XML, clip.clipPath );	
 			countDone++;
 			if ( fileToConvert.length > 0 ) 
@@ -407,25 +413,9 @@ package fr.batchass
 		{
 			Util.errorLog("cnv.start called");
 
-			frame = 0;
-			countNew = 0;
-			countDeleted = 0;
-			countChanged = 0;
-			countDone = 0;
-			countError = 0;
-			countNoChange = 0;
-			countTotal = 0;
-			nochgFiles = "";
-			newFiles = "";
-			delFiles = "";
-			chgFiles = "";
-			errFiles = "";
-			allFiles = "";
-			currentFilename = "";
-			status = "";
-			summary = "";
-			progress = "";
-			_progress = "";
+			frame = countNew = countDeleted = countChanged = countDone = countError = countNoChange = countTotal = 0;
+			nochgFiles = newFiles = delFiles = chgFiles = errFiles = allFiles = "";
+			currentFilename = status = summary = progress = _progress = "";
 			timer.start();
 		}
 		public function copyFile( src:String, dest:String ):void
@@ -487,7 +477,6 @@ package fr.batchass
 					copyFile( clip.clipPath, outPath + clip.clipGeneratedName + ".swf" );
 					//done, no thumbs, we generate xml clip
 					writeOwnXml( clip );
-
 				}
 			}
 			else
@@ -588,7 +577,78 @@ package fr.batchass
 				}	
 			}
 		}
-
+		private function deleteClips(event:Event): void 
+		{
+			if ( filesToDelete.length > 0 )
+			{			
+				deleteFile( filesToDelete[0] );
+				filesToDelete.shift();
+			}
+			else
+			{
+				if ( foldersToDelete.length > 0 )
+				{			
+					deleteFolder( foldersToDelete[0] );
+					foldersToDelete.shift();
+				}
+				else
+				{
+					if ( clipsXmlToDelete.length > 0 )
+					{			
+						clips.deleteClip( clipsXmlToDelete[0] );
+						clipsXmlToDelete.shift();
+					}
+				}
+			}
+		}
+		public function checkFilesAsync(): void 
+		{
+			Util.errorLog("delete inexistent files from db");
+			var clips:Clips = Clips.getInstance();
+			var clipList:XMLList = clips.CLIPS_XML..video as XMLList;
+			for each ( var clip:XML in clipList )
+			{
+				//test if own file
+				if ( clip.@urllocal )
+				{
+					var searchedFile:File = new File( session.ownFolderPath + File.separator + clip.@urllocal );
+					// search for file is own folder
+					if ( !searchedFile.exists ) 
+					{
+						countDeleted++;
+						delFiles += clip.@id + " ";
+						// delete clip
+						deleteXmlClipAsync( clip );
+					}		
+				}	 	
+			}			
+		}
+		public function deleteXmlClipAsync( clipXml:XML ): void 
+		{
+			if ( !clipDeleteTimer.running )
+			{
+				clipDeleteTimer.start();
+			}
+			Util.log("delete:" + session.dbFolderPath + File.separator + clipXml.@id + ".xml");
+			// delete xml file
+			filesToDelete.push( session.dbFolderPath + File.separator + clipXml.@id + ".xml" );
+			//deleteFile( session.dbFolderPath + File.separator + clipXml.@id + ".xml" );
+			// delete in clips.xml
+			clipsXmlToDelete.push( clipXml.@id );
+			//clips.deleteClip( clipXml.@id );
+			
+			// delete thumbs
+			filesToDelete.push( clipXml.urlthumb1 );
+			filesToDelete.push( clipXml.urlthumb2 );
+			filesToDelete.push( clipXml.urlthumb3 );
+			// delete thumbs folder
+			foldersToDelete.push( session.dldFolderPath+ File.separator + "thumbs" + File.separator + clipXml.@id );
+			// delete preview
+			filesToDelete.push( clipXml.urlpreview );
+			// delete preview folder
+			foldersToDelete.push( session.dldFolderPath+ File.separator + "preview" + File.separator + clipXml.@id );
+			
+		}
 		private function deleteThumbs( thumbsPath:String ): void 
 		{
 			deleteFile( thumbsPath + "thumb1.jpg" );
@@ -607,6 +667,20 @@ package fr.batchass
 				//TODO delete event listeners
 			}
 		}
+		
+		private function deleteFolder( path:String ): void 
+		{
+			var folder:File = new File( path );
+			// delete file if it exists
+			if ( folder.exists ) 
+			{
+				folder.addEventListener( IOErrorEvent.IO_ERROR, ioErrorHandler );
+				folder.addEventListener( SecurityErrorEvent.SECURITY_ERROR, securityErrorHandler );
+				folder.moveToTrash();
+				//TODO delete event listeners
+			}
+		}
+
 		private function outputDataHandler(event:ProgressEvent):void
 		{
 			var process:NativeProcess = event.target as NativeProcess;

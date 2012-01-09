@@ -345,39 +345,8 @@ protected function browseAndConvert(event:TimerEvent):void
 	
 	parentDocument.statusText.text = "Found " + ownFiles.length + " file(s)";
 	// delete inexistent files from db
-	Util.errorLog("delete inexistent files from db");
-	var clips:Clips = Clips.getInstance();
-	var clipList:XMLList = clips.CLIPS_XML..video as XMLList;
-	for each ( var clip:XML in clipList )
-	{
-		//test if own file
-		if ( clip.@urllocal )
-		{
-			var searchedFile:File = new File( session.ownFolderPath + File.separator + clip.@urllocal );
-			// search for file is own folder
-			if ( !searchedFile.exists ) 
-			{
-				Util.errorLog("delete:" + session.dbFolderPath + File.separator + clip.@id + ".xml");
-				// delete xml file
-				cnv.deleteFile( session.dbFolderPath + File.separator + clip.@id + ".xml" );
-				// delete in clips.xml
-				clips.deleteClip( clip.@id, clip.@urllocal );
-			
-				// delete thumbs
-				cnv.deleteFile( clip.urlthumb1 );
-				cnv.deleteFile( clip.urlthumb2 );
-				cnv.deleteFile( clip.urlthumb3 );
-				// delete thumbs folder
-				deleteFolder( session.dldFolderPath+ File.separator + "thumbs" + File.separator + clip.@id );
-				// delete preview
-				cnv.deleteFile( clip.urlpreview );
-				// delete preview folder
-				deleteFolder( session.dldFolderPath+ File.separator + "preview" + File.separator + clip.@id );
-				cnv.countDeleted++;
-				cnv.delFiles += clip.@id + " ";
-			}		
-		}	 	
-	}
+	cnv.checkFilesAsync();
+	
 	// read all files in the folder
 	processAllFiles( selectedDirectory );
 }
@@ -421,32 +390,10 @@ public function processAllFiles( selectedDir:File ):void
 	}	
 }
 
-private function deleteFolder( path:String ): void 
-{
-	var folder:File = new File( path );
-	// delete file if it exists
-	if ( folder.exists ) 
-	{
-		folder.addEventListener( IOErrorEvent.IO_ERROR, ioErrorHandler );
-		folder.addEventListener( SecurityErrorEvent.SECURITY_ERROR, securityErrorHandler );
-		folder.moveToTrash();
-		//TODO delete event listeners
-	}
-}
-
-
 protected function log_changeHandler(event:TextOperationEvent):void
 {
 	if ( log.text.length > 500 ) log.text = "";
 	log.validateNow();
 	log.scroller.verticalScrollBar.value = log.scroller.verticalScrollBar.maximum;
 }
-private function ioErrorHandler( event:IOErrorEvent ):void
-{
-	Util.log( 'TabConfig, An IO Error has occured: ' + event.text );
-}    
-// only called if a security error detected by flash player such as a sandbox violation
-private function securityErrorHandler( event:SecurityErrorEvent ):void
-{
-	Util.log( "TabConfig, securityErrorHandler: " + event.text );
-}
+
