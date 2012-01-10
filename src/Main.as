@@ -56,10 +56,6 @@ protected function vpDude_creationCompleteHandler(event:FlexEvent):void
 {	
 	this.validateDisplayList();
 	Util.log( "Start", true );
-	// autoupdate from Piotr
-	updater.initialize();
-	Util.log( "Check for new version, current: " + updater.currentVersion );
-	currentVersion = updater.currentVersion;
 	
 	this.addEventListener( MouseEvent.MOUSE_DOWN, moveWindow );
 	this.addEventListener( NativeWindowDisplayStateEvent.DISPLAY_STATE_CHANGE, onWindowMaximize );
@@ -97,6 +93,11 @@ public function addTabs():void
 		// load clipsFile when config is done
 		var clips:Clips = Clips.getInstance();
 		clips.loadClipsFile();
+		// autoupdate from Piotr
+		updater.initialize();
+		Util.log( "Check for new version, current: " + updater.currentVersion );
+		currentVersion = updater.currentVersion;
+
 	}
 }
 private function onMonitor(event:StatusEvent):void 
