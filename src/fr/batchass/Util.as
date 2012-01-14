@@ -126,13 +126,25 @@ package fr.batchass
 		public static function getFileNameFromFormerSlash( url:String ):String
 		{
 			var fileName:String = "";
-			var lastSlash:uint = url.lastIndexOf( '/' );
-			var formerSlash:uint = url.substr( 0, lastSlash - 1).lastIndexOf( '/' );
+			var lastSlash:int = url.lastIndexOf( '/' );
+			var formerSlash:int = url.substr( 0, lastSlash - 1).lastIndexOf( '/' );
 			if ( formerSlash > -1 )
 			{
 				fileName = url.substr( formerSlash + 1 );
 			}
 			return fileName;
+		}
+		
+		public static function getPathNameFromFormerSlash( url:String ):String
+		{
+			var pathName:String = "";
+			var lastSlash:int = url.lastIndexOf( '/' );
+			var formerSlash:int = url.substr( 0, lastSlash - 1).lastIndexOf( '/' );
+			if ( formerSlash > -1 )
+			{
+				pathName = url.substr( formerSlash + 1, lastSlash - formerSlash - 1);
+			}
+			return pathName;
 		}
 		
 		public static function getFileName( url:String ):String
@@ -146,6 +158,14 @@ package fr.batchass
 				fileName = url.substr( lastChar + 1 );
 			}
 			return fileName;
+		}
+		public static function getLastSeparatorIndex( url:String ):int
+		{
+			var fileName:String = url;
+			var lastSlash:int = url.lastIndexOf( '/' );
+			var lastBackSlash:int = url.lastIndexOf( '\\' );
+
+			return Math.max( lastSlash, lastBackSlash );
 		}
 		
 		public static function getFileNameWithoutTrailingNumbersAndExtension( url:String ):String

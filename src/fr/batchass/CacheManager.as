@@ -117,23 +117,51 @@ package fr.batchass
 			return localUrl;
 		}
 		public function downloadClipFiles( thumbnailUrl:String, assetUrl:String, swfUrl:String ):void
-		{			
-			var tUrl:String = _cacheDir.nativePath + File.separator + THUMBS_PATH + File.separator + Util.getFileNameFromFormerSlash( thumbnailUrl ) ;
-			var tCacheFile:File = new File( tUrl );
+		{	
+			var lastSeparatorIndex:int = Util.getLastSeparatorIndex( thumbnailUrl );
+			var thumbPath:String = thumbnailUrl.substr( 0, lastSeparatorIndex );
+
+			var thumbFileName:String = Util.getPathNameFromFormerSlash( thumbnailUrl );
+			var t1Url:String = _cacheDir.nativePath + File.separator + THUMBS_PATH + File.separator + thumbFileName + File.separator + "thumb1.jpg";
+			var t2Url:String = _cacheDir.nativePath + File.separator + THUMBS_PATH + File.separator + thumbFileName + File.separator + "thumb2.jpg";
+			var t3Url:String = _cacheDir.nativePath + File.separator + THUMBS_PATH + File.separator + thumbFileName + File.separator + "thumb3.jpg";
+			var t1CacheFile:File = new File( t1Url );
+			var t2CacheFile:File = new File( t2Url );
+			var t3CacheFile:File = new File( t3Url );
 			var sUrl:String = _cacheDir.nativePath + File.separator + SWF_PATH + File.separator + Util.getFileNameFromFormerSlash( swfUrl ) ;
 			var sCacheFile:File = new File( sUrl );
 			var cUrl:String = _cacheDir.nativePath + File.separator + CLIPS_PATH + File.separator + Util.getFileNameFromFormerSlash( assetUrl ) ;
 			var cCacheFile:File = new File( cUrl );
 			
-			Util.cacheLog( "CacheManager, downloadClipFiles thumb localUrl: " + tUrl );
-			if( tCacheFile.exists )
+			Util.cacheLog( "CacheManager, downloadClipFiles thumb localUrl: " + t1Url );
+			if( t1CacheFile.exists )
 			{
-				Util.cacheLog( "CacheManager, downloadClipFiles thumb cacheFile exists: " + tCacheFile.url );
+				Util.cacheLog( "CacheManager, downloadClipFiles thumb cacheFile exists: " + t1CacheFile.url );
 			} 
 			else 
 			{
 				Util.cacheLog( "CacheManager, downloadClipFiles thumb cacheFile does not exist: " + thumbnailUrl );
-				addFileToDownload( thumbnailUrl, tUrl );			
+				addFileToDownload( thumbPath + "/thumb1.jpg", t1Url );			
+			}	
+			Util.cacheLog( "CacheManager, downloadClipFiles thumb localUrl: " + t2Url );
+			if( t2CacheFile.exists )
+			{
+				Util.cacheLog( "CacheManager, downloadClipFiles thumb cacheFile exists: " + t2CacheFile.url );
+			} 
+			else 
+			{
+				Util.cacheLog( "CacheManager, downloadClipFiles thumb cacheFile does not exist: " + thumbnailUrl );
+				addFileToDownload( thumbPath + "/thumb2.jpg", t2Url );			
+			}	
+			Util.cacheLog( "CacheManager, downloadClipFiles thumb localUrl: " + t3Url );
+			if( t3CacheFile.exists )
+			{
+				Util.cacheLog( "CacheManager, downloadClipFiles thumb cacheFile exists: " + t3CacheFile.url );
+			} 
+			else 
+			{
+				Util.cacheLog( "CacheManager, downloadClipFiles thumb cacheFile does not exist: " + thumbnailUrl );
+				addFileToDownload( thumbPath + "/thumb3.jpg", t3Url );			
 			}	
 			if ( sCacheFile.exists )
 			{
