@@ -27,14 +27,13 @@
   <flashCatalyst validateFlashCatalystCompatibility="false"/>
   <buildTargets>
     <buildTarget buildTargetName="default">
-      <airSettings airCertificatePath="/Users/adm.bruce/Documents/projects/workspace/vpDude/certificate/vpDude.p12" airTimestamp="true" anePathSet="true" version="1">
+      <airSettings airCertificatePath="C:/Users/Bruce/Documents/projects/workspace/vpDude/certificate/vpDude.p12" airTimestamp="true" version="1">
         <airExcludes>
-          <pathEntry path=".DS_Store"/>
-          <pathEntry path="ffmpeg/ffmpeg.exe"/>
-          <pathEntry path="images/.DS_Store"/>
+          <pathEntry path="images/Thumbs.db"/>
+          <pathEntry path="ffmpeg/ffmpeg.dat"/>
+          <pathEntry path="images/previewnotavailable.png"/>
           <pathEntry path="ffmpeg/ffmpeg.lame"/>
         </airExcludes>
-        <anePaths/>
       </airSettings>
       <actionScriptSettings version="1"/>
     </buildTarget>
