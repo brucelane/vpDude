@@ -49,7 +49,7 @@ public var launchE4X:Function = function( e4xResult : String ) : void
 }
 private function checkRemaining( event:Event ): void 
 {
-	remaining.text = "Files remaining to download: "+ cache.filesRemaining;			
+	if (cache) remaining.text = "Files remaining to download: "+ cache.filesRemaining;			
 }
 private function e4xLoadComplete( event:Event ):void
 {

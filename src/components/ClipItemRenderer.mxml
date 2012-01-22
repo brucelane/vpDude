@@ -18,11 +18,11 @@
 					   width="106" height="80">
 		<mx:Image id="imgUrl" alpha.hovered=".7" 
 				  source="{cachedThumbnail1}" 
-				  source.hovered="{cachedThumbnail2}" 
-				  source.selected="{cachedThumbnail3}" 
 				  scaleContent="false"
 				  mouseDown="imgUrl_mouseDownHandler(event)"
 				  toolTip="Click to drag video"
 				  />
+		<!--source.hovered="{cachedThumbnail2}" 
+		source.selected="{cachedThumbnail3}"--> 
 	</s:BorderContainer>
 </s:ItemRenderer>
